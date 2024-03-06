@@ -14,7 +14,7 @@ RootInterface<T>::~RootInterface() {}
 template <typename T>
 void RootInterface<T>::init() {
   fEventData = new T();
-  fFile = TFile::Open(fFilename.c_str(),"UPDATE");
+  fFile = TFile::Open(fFilename.c_str(),"READ");
 }
 
 template <typename T>

@@ -18,12 +18,16 @@ public:
   ~dimensionE();
 
   void Rbool(G4bool Rbool) { fRbool = Rbool; }
-  void SetInnerR_new(G4double innerR) { finnerR_new = innerR; }
+  void SetInnerR_new(G4double innerR) { fInnerR_ref = innerR; }
   void SetTower_height(G4double tower_height) { ftower_height = tower_height; }
   void SetNumZRot(G4int num) { fnumzrot = num; fPhiZRot = 2*M_PI/(G4double)num; }
   void SetDeltaTheta(G4double theta) { fdeltatheta = theta; }
   void SetThetaOfCenter(G4double theta) { fthetaofcenter = theta; }
   void SetPMTT(G4double PMTT) { fPMTT = PMTT; }
+  void SetNumberOfTowre(G4int num) { 
+    fNumTower = num; 
+    finnerR_new = fInnerR_ref / sin(fthetaofcenter);
+  }
 
   bool GetRbool() { return fRbool; }
 
@@ -54,6 +58,7 @@ private:
   G4double fdeltatheta;
   G4double fthetaofcenter;
   G4double finnerR_new;
+  G4double fInnerR_ref;
   G4double fTrns_Length;
   G4ThreeVector fTrns_Vector;
   G4ThreeVector fV1;
@@ -63,6 +68,8 @@ private:
   G4double fPMTT;
 
   G4double x,y,z;
+
+  G4int fNumTower;
 
   G4double innerSide_half;
   G4double outerSide_half;

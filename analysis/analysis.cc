@@ -125,7 +125,7 @@ int main(int argc, char* argv[]) {
     }
 
     float T_max = tT_max->GetBinCenter( tT_max->GetMaximumBin() );
-    float depth = ( T_max - 1.8/0.3 - 2.0/0.1895 ) / ( 1./0.3 - 1./0.1895 ); // 1895
+    float depth = ( T_max - 0.3/0.3 - 2.0/0.1895 ) / ( 1./0.3 - 1./0.1895 ); // 1895
 
     delete tT_max;
 

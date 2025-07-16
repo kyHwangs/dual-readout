@@ -147,15 +147,6 @@ void DRsimPrimaryGeneratorAction::GeneratePrimaries(G4Event* event) {
   G4double dz0 = z0p - z0;
   G4double dy0 = x0 * tan(1.0 * M_PI / 180.);
 
-  // G4double xRelLen = xTowerFront;
-  // G4double yRelLen = yTowerFront-fY_0/10;
-  // G4double zRelLen = zTowerFront-fZ_0/10;
-
-  // double NormLen = sqrt(xRelLen*xRelLen+yRelLen*yRelLen+zRelLen*zRelLen);
-  // double LenRatio = 1-180/NormLen;
-
-  // fOrg.set(GunPosition->getX()+10*(LenRatio*xRelLen), GunPosition->getY()+fY_0+10*(LenRatio*yRelLen),GunPosition->getZ()+fZ_0+10*(LenRatio*zRelLen));
-  
   G4double xBeamCenter = 0.;
   G4double yBeamCenter = -dy0 *mm;
   G4double zBeamCenter = -dz0 *mm;
@@ -170,18 +161,11 @@ void DRsimPrimaryGeneratorAction::GeneratePrimaries(G4Event* event) {
   G4double yBeamCenterCorrected = yBeamCenter + yBeamCeneterToTowerCenter * (rBeamCenterToTowerCenter - 300.) / rBeamCenterToTowerCenter;
   G4double zBeamCenterCorrected = zBeamCenter + zBeamCeneterToTowerCenter * (rBeamCenterToTowerCenter - 300.) / rBeamCenterToTowerCenter;
 
-  std::cout << xBeamCenter << " " << yBeamCenter << " " << zBeamCenter << std::endl;
-  std::cout << x0 << " " << y0 << " " << z0 << std::endl;
-  std::cout << rBeamCenterToTowerCenter << " " << (rBeamCenterToTowerCenter - 300.) / rBeamCenterToTowerCenter << std::endl;
-  std::cout << xBeamCenterCorrected << " " << yBeamCenterCorrected << " " << zBeamCenterCorrected << std::endl;
-
-
   auto GunPosition = new G4ThreeVector(0., randy, randz);
   GunPosition->rotateY(fTheta);
 
   fOrg.set(xBeamCenterCorrected - GunPosition->getX() *mm, yBeamCenterCorrected - GunPosition->getY() *mm, zBeamCenterCorrected - GunPosition->getZ() *mm);
   
-
   fParticleGun->SetParticlePosition(fOrg); // http://www.apc.univ-paris7.fr/~franco/g4doxy/html/classG4VPrimaryGenerator.html
 
   fDirection.setREtaPhi(1.,0.,0.);

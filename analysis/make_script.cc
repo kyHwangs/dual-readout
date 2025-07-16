@@ -76,7 +76,7 @@ export PYTHIA8=/cvmfs/sft.cern.ch/lcg/releases/LCG_96b/MCGenerators/pythia8/240/
 export PYTHIA8DATA=/cvmfs/sft.cern.ch/lcg/releases/LCG_96b/MCGenerators/pythia8/240/x86_64-centos7-gcc8-opt/share/Pythia8/xmldoc
 export ROOT_INCLUDE_PATH=/cvmfs/sft.cern.ch/lcg/releases/LCG_96b/hepmc3/3.1.2/x86_64-centos7-gcc8-opt/include:$ROOT_INCLUDE_PATH
 
-export DRCBASE=`pwd
+export DRCBASE=`pwd`
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HEPMC_DIR/lib64:$FASTJET_DIR/lib:$PYTHIA_DIR:$PWD/install/lib
 cd )" + fConfigBaseDir + R"(
 
@@ -101,7 +101,7 @@ arguments           = $(ProcId)
 output              = )" + fLogBaseDir + R"(/out_$(ProcId).out
 error               = )" + fLogBaseDir + R"(/err_$(ProcId).err
 log                 = )" + fLogBaseDir + R"(/log_$(ProcId).log
-request_memory      = 3 GB
+request_memory      = 1.5 GB
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT

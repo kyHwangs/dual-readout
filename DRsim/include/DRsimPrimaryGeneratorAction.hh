@@ -21,6 +21,9 @@ public:
 
   virtual void GeneratePrimaries(G4Event*);
 
+  void SetTowerNum(G4int nTower) { fTowerNum = nTower; }
+  G4int GetTowerNum() const { return fTowerNum; }
+
   void SetTheta(G4double theta) { fTheta = theta; }
   G4double GetTheta() const { return fTheta; }
 
@@ -31,6 +34,7 @@ public:
 
   void SetRandX(G4double randx) { fRandX = randx; }
   void SetRandY(G4double randy) { fRandY = randy; }
+  void SetRandZ(G4double randz) { fRandZ = randz; }
 
   static G4ThreadLocal int sIdxEvt;
   static int sNumEvt;
@@ -55,13 +59,18 @@ private:
   G4ParticleDefinition* fProton;
   G4ParticleDefinition* fOptGamma;
 
+  G4int fTowerNum;
   G4double fTheta;
   G4double fPhi;
   G4double fRandX;
   G4double fRandY;
+  G4double fRandZ;
 
   G4double fY_0;
   G4double fZ_0;
+
+  G4double fTowerX[80];
+  G4double fTowerZ[80];
 
   G4ThreeVector fOrg;
   G4ThreeVector fDirection;

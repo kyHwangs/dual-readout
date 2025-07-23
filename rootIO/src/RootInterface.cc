@@ -3,13 +3,27 @@
 #include "RecoInterface.h"
 
 template <typename T>
-RootInterface<T>::RootInterface(const std::string& filename)
+RootInterface<T>::RootInterface(const std::string& filename, bool key)
 : fFilename(filename), fNumEvt(0) {
-  init();
+  if (key) init();
+  if (!key) PrepareChain();
 }
 
 template <typename T>
 RootInterface<T>::~RootInterface() {}
+
+template <typename T>
+void RootInterface<T>::PrepareChain() {
+  fEventData = new T();
+}
+
+template <typename T>
+void RootInterface<T>::GetChain(const std::string& treename) {
+  fChain = new TChain(treename.c_str());
+  fChain->Add((fFilename+"/*.root").c_str());
+  fTree = fChain;
+  fTree->SetBranchAddress((treename+"EventData").c_str(),&fEventData);
+}
 
 template <typename T>
 void RootInterface<T>::init() {
@@ -49,8 +63,9 @@ void RootInterface<T>::write() {
 
 template <typename T>
 void RootInterface<T>::close() {
-  fFile->Close();
+  if (fFile) fFile->Close();
   if (fEventData) delete fEventData;
+  if (fChain) delete fChain;
 }
 
 template <typename T>

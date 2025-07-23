@@ -22,7 +22,7 @@ DRsimRunAction::DRsimRunAction(G4int seed, G4String filename, G4bool useHepMC)
   G4AutoLock lock(&DRsimRunActionMutex);
 
   if (!sRootIO) {
-    sRootIO = new RootInterface<DRsimInterface::DRsimEventData>(fFilename+"_"+std::to_string(fSeed)+".root");
+    sRootIO = new RootInterface<DRsimInterface::DRsimEventData>(fFilename+"_"+std::to_string(fSeed)+".root", true);
     sRootIO->create("DRsim","DRsimEventData");
   }
 

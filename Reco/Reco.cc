@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
   std::string filenum = std::string(argv[1]);
   std::string filename = std::string(argv[2]);
 
-  RootInterface<RecoInterface::RecoEventData>* recoInterface = new RootInterface<RecoInterface::RecoEventData>(filename+"_"+filenum+".root");
+  RootInterface<RecoInterface::RecoEventData>* recoInterface = new RootInterface<RecoInterface::RecoEventData>(filename+"_"+filenum+".root", true);
   recoInterface->create("Reco","RecoEventData");
 
   fastjetInterface fjFiber_S;
@@ -19,8 +19,8 @@ int main(int argc, char* argv[]) {
   fastjetInterface fjFiber_C;
   fjFiber_C.init(recoInterface->getTree(),"RecoFiberJets_C");
 
-  RootInterface<DRsimInterface::DRsimEventData>* drInterface = new RootInterface<DRsimInterface::DRsimEventData>(filename+"_"+filenum+".root");
-  drInterface->set("DRsim","DRsimEventData");
+  RootInterface<DRsimInterface::DRsimEventData>* drInterface = new RootInterface<DRsimInterface::DRsimEventData>(filename+"/root/*.root", false);
+  drInterface->GetChain("DRsim");
 
   RecoTower* recoTower = new RecoTower();
   recoTower->readCSV();

@@ -60,3 +60,29 @@ In install
 ```bash
 ./bin/analysis <project_name> <x_axis_min> <x_axis_max> 
 ```
+
+### How to change beam particle and its energy
+After running ```./bin/make_script <project_name>``` in Install, macro file will be generated with ```./<project_name>/run_macro.mac```.
+```
+# run_macro.mac
+
+/vis/disable
+/run/numberOfThreads 1
+/run/initialize
+/run/verbose 1
+
+/DRsim/generator/randy 3.
+/DRsim/generator/randz 3.
+/DRsim/generator/nTower 0
+
+/gun/particle e-
+/gun/energy 20 GeV
+
+/run/beamOn 2
+```
+
+```/gun/particle <particle>```: beam particle (e-, pi+ and etc.)
+```/gun/energy <value> <unit>```: beam particel energy
+
+
+

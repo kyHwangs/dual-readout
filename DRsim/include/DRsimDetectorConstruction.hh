@@ -176,6 +176,11 @@ private:
   G4double outerSide_half;
   G4double outerSide_half_;
 
+  G4double fiber_height;
+
+  G4double x_in_y;
+  G4double tan_in, cos_in, sin_in, ratioval;
+
   G4double fDThetaBarrel[52] = {
     0.02222,0.02220,0.02217,0.02214,0.02209,0.02203,0.02196,0.02188,0.02179,0.02169,
     0.02158,0.02146,0.02133,0.02119,0.02105,0.02089,0.02073,0.02056,0.02039,0.02020,

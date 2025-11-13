@@ -101,7 +101,7 @@ arguments           = $(ProcId)
 output              = )" + fLogBaseDir + R"(/out_$(ProcId).out
 error               = )" + fLogBaseDir + R"(/err_$(ProcId).err
 log                 = )" + fLogBaseDir + R"(/log_$(ProcId).log
-request_memory      = 1.5 GB
+request_memory      = 3 GB
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT

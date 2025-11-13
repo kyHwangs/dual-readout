@@ -24,9 +24,9 @@ using namespace std;
 G4ThreadLocal DRsimMagneticField* DRsimDetectorConstruction::fMagneticField = 0;
 G4ThreadLocal G4FieldManager* DRsimDetectorConstruction::fFieldMgr = 0;
 
-int DRsimDetectorConstruction::sNumBarrel = 52;
-int DRsimDetectorConstruction::sNumEndcap = 40;
-int DRsimDetectorConstruction::sNumZRot = 283;
+int DRsimDetectorConstruction::sNumBarrel = 52; // 52
+int DRsimDetectorConstruction::sNumEndcap = 40; // 40
+int DRsimDetectorConstruction::sNumZRot = 283;   // 283
 
 DRsimDetectorConstruction::DRsimDetectorConstruction()
 : G4VUserDetectorConstruction(), fMessenger(0), fMaterials(NULL) {
@@ -197,13 +197,13 @@ void DRsimDetectorConstruction::Barrel(G4LogicalVolume* towerLogical[], G4Logica
     pmtg = new G4Trap("PMTGB",pt);
     PMTGLogical[i] = new G4LogicalVolume(pmtg,FindMaterial("G4_AIR"),towerName);
 
-    for(int j=0;j<sNumZRot;j++){
+    dimB->Getpt(pt);
+    fiberBarrel(i,fDThetaBarrel[i],towerLogical,fiberLogical,fiberLogical_);
+
+    for(int j=0;j<sNumZRot;j++){ // 1->sNumZRot
       new G4PVPlacement(dimB->GetRM(j),dimB->GetOrigin(j),towerLogical[i],towerName,worldLogical,false,j,checkOverlaps);
       new G4PVPlacement(dimB->GetRM(j),dimB->GetOrigin_PMTG(j),PMTGLogical[i],towerName,worldLogical,false,j,checkOverlaps);
     }
-
-    dimB->Getpt(pt);
-    fiberBarrel(i,fDThetaBarrel[i],towerLogical,fiberLogical,fiberLogical_);
 
     int iTheta = dimB->GetRbool() ? i : -i-1;
     float signedTowerTheta = dimB->GetRbool() ? towerTheta : -towerTheta;
@@ -265,13 +265,13 @@ void DRsimDetectorConstruction::Endcap(G4LogicalVolume* towerLogical[], G4Logica
     pmtg = new G4Trap("PMTGE",pt);
     PMTGLogical[i] = new G4LogicalVolume(pmtg,FindMaterial("G4_AIR"),towerName);
 
-    for(int j=0;j<sNumZRot;j++){
+    dimE->Getpt(pt);
+    fiberEndcap(i,fDThetaEndcap,towerLogical,fiberLogical,fiberLogical_);
+
+    for(int j=0;j<sNumZRot;j++){ // sNumZRot
       new G4PVPlacement(dimE->GetRM(j),dimE->GetOrigin(j),towerLogical[i],towerName,worldLogical,false,j,checkOverlaps);
       new G4PVPlacement(dimE->GetRM(j),dimE->GetOrigin_PMTG(j),PMTGLogical[i],towerName,worldLogical,false,j,checkOverlaps);
     }
-
-    dimE->Getpt(pt);
-    fiberEndcap(i,fDThetaEndcap,towerLogical,fiberLogical,fiberLogical_);
 
     int iTheta = dimE->GetRbool() ? i+52 : -i-52-1;
     float signedTowerTheta = dimE->GetRbool() ? towerTheta : -towerTheta;
@@ -337,6 +337,7 @@ void DRsimDetectorConstruction::fiberBarrel(G4int i, G4double deltatheta_,G4Logi
   fTowerXY = std::make_pair(numx,numy);
 
   G4bool fWhich = false;
+  G4bool ftag   = false;
   for (int j = 0; j < numy; j++) {
     for (int k = 0; k < numx; k++) {
       G4float fX = -1.5*mm*(numx/2) + k*1.5*mm + ( numx%2==0 ? 0.75*mm : 0 );
@@ -351,25 +352,67 @@ void DRsimDetectorConstruction::fiberBarrel(G4int i, G4double deltatheta_,G4Logi
 
   for (unsigned int j = 0; j<fFiberX.size();j++) {
 
+    fiber_height = towerH;
+    ftag = false;
+    if (abs(fFiberX.at(j))+0.5 > v3.getX()*tan(M_PI/(double)sNumZRot)) {
+      ftag = true;
+      x_in_y = 0;
+      tan_in = 0;
+      double tan_1 = 0;
+      double tan_2 = 0;
+      ratioval = 0;
+
+      if (dimB->GetRbool()) {
+        tan_1 = (v1.getX()*tan(phi_unit/2.)-v3.getX()*tan(M_PI/(double)sNumZRot))/(2*innerSide_half)*(fFiberY.at(j)+innerSide_half)+v3.getX()*tan(M_PI/(double)sNumZRot);
+        tan_2 = (v2.getX()*tan(phi_unit/2.)-v4.getX()*tan(phi_unit/2.))/(2*outerSide_half)*(fFiberY.at(j)+outerSide_half)+v4.getX()*tan(phi_unit/2.);
+      } else {
+        tan_1 = -(v1.getX()*tan(phi_unit/2.)-v3.getX()*tan(M_PI/(double)sNumZRot))/(2*innerSide_half)*(fFiberY.at(j)+innerSide_half)+v1.getX()*tan(phi_unit/2.);
+        tan_2 = -(v2.getX()*tan(phi_unit/2.)-v4.getX()*tan(phi_unit/2.))/(2*outerSide_half)*(fFiberY.at(j)+outerSide_half)+v2.getX()*tan(phi_unit/2.);
+      }
+
+      tan_in = (v1.getX()*tan(phi_unit/2.)-v3.getX()*tan(M_PI/(double)sNumZRot))/(2*innerSide_half)*(abs(fFiberX.at(j))+0.5-tan_1)/(tan_2-tan_1) + (v2.getX()*tan(phi_unit/2.)-v4.getX()*tan(phi_unit/2.))/(2*outerSide_half)*(tan_2-abs(fFiberX.at(j))-0.5)/(tan_2-tan_1);
+      sin_in = tan_in/sqrt(1+pow(tan_in, 2));
+      cos_in = 1/sqrt(1+pow(tan_in, 2));
+
+      fiber_height = (towerH-(towerH/(tan_2-tan_1))*(abs(fFiberX.at(j))+0.5*cos_in-tan_1));
+
+      if (fiber_height > towerH) fiber_height = towerH;
+    }
+    if (abs(fFiberY.at(j))+0.5 > innerSide_half) {
+      if (ftag) {
+        if (fFiberY.at(j)>0) {
+          if ((v2.getX()*tan(phi_unit/2.)-v1.getX()*tan(phi_unit/2.))/(outerSide_half-innerSide_half)*(fFiberY.at(j)-innerSide_half) + v1.getX()*tan(phi_unit/2.) > abs(fFiberX.at(j))) {
+            fiber_height = (towerH/2-(towerH/(outerSide_half-innerSide_half)*(abs(fFiberY.at(j))+0.5-(innerSide_half+outerSide_half)/2)));
+          }
+        } else {
+          if ((v3.getX()*tan(M_PI/(double)sNumZRot)-v4.getX()*tan(phi_unit/2.))/(outerSide_half-innerSide_half)*(fFiberY.at(j)+innerSide_half) + v3.getX()*tan(M_PI/(double)sNumZRot) > abs(fFiberX.at(j))) {
+            fiber_height = (towerH/2-(towerH/(outerSide_half-innerSide_half)*(abs(fFiberY.at(j))+0.5-(innerSide_half+outerSide_half)/2)));
+          }
+        }
+      } else {
+        fiber_height = (towerH/2-(towerH/(outerSide_half-innerSide_half)*(abs(fFiberY.at(j))+0.5-(innerSide_half+outerSide_half)/2))); 
+      }
+    }
+    fiber  = new G4Tubs("fiber", 0, clad_C_rMax, fiber_height/2, 0.*deg, 360.*deg);
+
     if ( !fFiberWhich.at(j) ) { //c fibre
+      fiberC = new G4Tubs("fiberC", 0, core_C_rMax, fiber_height/2, 0.*deg, 360.*deg);
 
-      intersect = new G4IntersectionSolid("fiber_",fiber,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
-      fiberLogical[i].push_back(new G4LogicalVolume(intersect,FindMaterial("FluorinatedPolymer"),name));
-      new G4PVPlacement(0,G4ThreeVector(fFiberX.at(j),fFiberY.at(j),0),fiberLogical[i].at(j),name,towerLogical[i],false,j,checkOverlaps);
+      fiberLogical[i].push_back(new G4LogicalVolume(fiber,FindMaterial("FluorinatedPolymer"),name));
+      new G4PVPlacement(0,G4ThreeVector(fFiberX.at(j),fFiberY.at(j),towerH/2-fiber_height/2),fiberLogical[i].at(j),name,towerLogical[i],false,j,checkOverlaps);
 
-      intersect_ = new G4IntersectionSolid("fiber_",fiberC,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
-      fiberLogical_[i].push_back(new G4LogicalVolume(intersect_,FindMaterial("PMMA"),name));
+      fiberLogical_[i].push_back(new G4LogicalVolume(fiberC,FindMaterial("PMMA"),name));
       new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),fiberLogical_[i].at(j),name,fiberLogical[i].at(j),false,j,checkOverlaps);
 
       fiberLogical[i].at(j)->SetVisAttributes(fVisAttrGray);
       fiberLogical_[i].at(j)->SetVisAttributes(fVisAttrBlue);
     } else { // s fibre
-      intersect = new G4IntersectionSolid("fiber_",fiber,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
-      fiberLogical[i].push_back(new G4LogicalVolume(intersect,FindMaterial("PMMA"),name));
-      new G4PVPlacement(0,G4ThreeVector(fFiberX.at(j),fFiberY.at(j),0),fiberLogical[i].at(j),name,towerLogical[i],false,j,checkOverlaps);
+      fiberS = new G4Tubs("fiberS", 0, core_S_rMax, fiber_height/2, 0.*deg, 360.*deg);
 
-      intersect_ = new G4IntersectionSolid("fiber_",fiberS,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
-      fiberLogical_[i].push_back(new G4LogicalVolume(intersect_,FindMaterial("Polystyrene"),name));
+      fiberLogical[i].push_back(new G4LogicalVolume(fiber,FindMaterial("PMMA"),name));
+      new G4PVPlacement(0,G4ThreeVector(fFiberX.at(j),fFiberY.at(j),towerH/2-fiber_height/2),fiberLogical[i].at(j),name,towerLogical[i],false,j,checkOverlaps);
+
+      fiberLogical_[i].push_back(new G4LogicalVolume(fiberS,FindMaterial("Polystyrene"),name));
       new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),fiberLogical_[i].at(j),name,fiberLogical[i].at(j),false,j,checkOverlaps);
 
       fiberLogical[i].at(j)->SetVisAttributes(fVisAttrGray);
@@ -397,6 +440,7 @@ void DRsimDetectorConstruction::fiberEndcap(G4int i, G4double deltatheta_, G4Log
   fTowerXY = std::make_pair(numx,numy);
 
   G4bool fWhich = false;
+  G4bool ftag   = false;
   for (int j = 0; j < numy; j++) {
     for (int k = 0; k < numx; k++) {
       G4float fX = -1.5*mm*(numx/2) + k*1.5*mm + ( numx%2==0 ? 0.75*mm : 0 );
@@ -410,26 +454,69 @@ void DRsimDetectorConstruction::fiberEndcap(G4int i, G4double deltatheta_, G4Log
   }
 
   for (unsigned int j = 0; j<fFiberX.size();j++) {
-    // determine z value for center of fibre
+
+    fiber_height = towerH;
+    ftag = false;
+    if (abs(fFiberX.at(j))+0.5 > v3.getX()*tan(M_PI/(double)sNumZRot)) {
+      ftag = true;
+      x_in_y = 0;
+      tan_in = 0;
+      double tan_1 = 0;
+      double tan_2 = 0;
+      ratioval = 0;
+
+      if (dimB->GetRbool()) {
+        tan_1 = (v1.getX()*tan(phi_unit/2.)-v3.getX()*tan(M_PI/(double)sNumZRot))/(2*innerSide_half)*(fFiberY.at(j)+innerSide_half)+v3.getX()*tan(M_PI/(double)sNumZRot);
+        tan_2 = (v2.getX()*tan(phi_unit/2.)-v4.getX()*tan(phi_unit/2.))/(2*outerSide_half)*(fFiberY.at(j)+outerSide_half)+v4.getX()*tan(phi_unit/2.);
+      } else {
+        tan_1 = -(v1.getX()*tan(phi_unit/2.)-v3.getX()*tan(M_PI/(double)sNumZRot))/(2*innerSide_half)*(fFiberY.at(j)+innerSide_half)+v1.getX()*tan(phi_unit/2.);
+        tan_2 = -(v2.getX()*tan(phi_unit/2.)-v4.getX()*tan(phi_unit/2.))/(2*outerSide_half)*(fFiberY.at(j)+outerSide_half)+v2.getX()*tan(phi_unit/2.);
+      }
+
+      tan_in = (v1.getX()*tan(phi_unit/2.)-v3.getX()*tan(M_PI/(double)sNumZRot))/(2*innerSide_half)*(abs(fFiberX.at(j))+0.5-tan_1)/(tan_2-tan_1) + (v2.getX()*tan(phi_unit/2.)-v4.getX()*tan(phi_unit/2.))/(2*outerSide_half)*(tan_2-abs(fFiberX.at(j))-0.5)/(tan_2-tan_1);
+      sin_in = tan_in/sqrt(1+pow(tan_in, 2));
+      cos_in = 1/sqrt(1+pow(tan_in, 2));
+
+      fiber_height = (towerH-(towerH/(tan_2-tan_1))*(abs(fFiberX.at(j))+0.5*cos_in-tan_1));
+
+      if (fiber_height > towerH) fiber_height = towerH;
+    }
+    if (abs(fFiberY.at(j))+0.5 > innerSide_half) {
+      if (ftag) {
+        if (fFiberY.at(j)>0) {
+          if ((v2.getX()*tan(phi_unit/2.)-v1.getX()*tan(phi_unit/2.))/(outerSide_half-innerSide_half)*(fFiberY.at(j)-innerSide_half) + v1.getX()*tan(phi_unit/2.) > abs(fFiberX.at(j))) {
+            fiber_height = (towerH/2-(towerH/(outerSide_half-innerSide_half)*(abs(fFiberY.at(j))+0.5-(innerSide_half+outerSide_half)/2)));
+          }
+        } else {
+          if ((v3.getX()*tan(M_PI/(double)sNumZRot)-v4.getX()*tan(phi_unit/2.))/(outerSide_half-innerSide_half)*(fFiberY.at(j)+innerSide_half) + v3.getX()*tan(M_PI/(double)sNumZRot) > abs(fFiberX.at(j))) {
+            fiber_height = (towerH/2-(towerH/(outerSide_half-innerSide_half)*(abs(fFiberY.at(j))+0.5-(innerSide_half+outerSide_half)/2)));
+          }
+        }
+      } else {
+        fiber_height = (towerH/2-(towerH/(outerSide_half-innerSide_half)*(abs(fFiberY.at(j))+0.5-(innerSide_half+outerSide_half)/2))); 
+      }
+    }
+
+    fiber  = new G4Tubs("fiber", 0, clad_C_rMax, fiber_height/2, 0.*deg, 360.*deg);
 
     if ( !fFiberWhich.at(j) ) { //c fibre
-      intersect = new G4IntersectionSolid("fiber_",fiber,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
-      fiberLogical[i].push_back(new G4LogicalVolume(intersect,FindMaterial("FluorinatedPolymer"),name));
-      new G4PVPlacement(0,G4ThreeVector(fFiberX.at(j),fFiberY.at(j),0),fiberLogical[i].at(j),name,towerLogical[i],false,j,checkOverlaps);
+      fiberC = new G4Tubs("fiberC", 0, core_C_rMax, fiber_height/2, 0.*deg, 360.*deg);
 
-      intersect_ = new G4IntersectionSolid("fiber_",fiberC,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
-      fiberLogical_[i].push_back(new G4LogicalVolume(intersect_,FindMaterial("PMMA"),name));
+      fiberLogical[i].push_back(new G4LogicalVolume(fiber,FindMaterial("FluorinatedPolymer"),name));
+      new G4PVPlacement(0,G4ThreeVector(fFiberX.at(j),fFiberY.at(j),towerH/2-fiber_height/2),fiberLogical[i].at(j),name,towerLogical[i],false,j,checkOverlaps);
+
+      fiberLogical_[i].push_back(new G4LogicalVolume(fiberC,FindMaterial("PMMA"),name));
       new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),fiberLogical_[i].at(j),name,fiberLogical[i].at(j),false,j,checkOverlaps);
 
       fiberLogical[i].at(j)->SetVisAttributes(fVisAttrGray);
       fiberLogical_[i].at(j)->SetVisAttributes(fVisAttrBlue);
     } else { // s fibre
-      intersect = new G4IntersectionSolid("fiber_",fiber,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
-      fiberLogical[i].push_back(new G4LogicalVolume(intersect,FindMaterial("PMMA"),name));
-      new G4PVPlacement(0,G4ThreeVector(fFiberX.at(j),fFiberY.at(j),0),fiberLogical[i].at(j),name,towerLogical[i],false,j,checkOverlaps);
+      fiberS = new G4Tubs("fiberS", 0, core_S_rMax, fiber_height/2, 0.*deg, 360.*deg);
 
-      intersect_ = new G4IntersectionSolid("fiber_",fiberS,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
-      fiberLogical_[i].push_back(new G4LogicalVolume(intersect_,FindMaterial("Polystyrene"),name));
+      fiberLogical[i].push_back(new G4LogicalVolume(fiber,FindMaterial("PMMA"),name));
+      new G4PVPlacement(0,G4ThreeVector(fFiberX.at(j),fFiberY.at(j),towerH/2-fiber_height/2),fiberLogical[i].at(j),name,towerLogical[i],false,j,checkOverlaps);
+
+      fiberLogical_[i].push_back(new G4LogicalVolume(fiberS,FindMaterial("Polystyrene"),name));
       new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),fiberLogical_[i].at(j),name,fiberLogical[i].at(j),false,j,checkOverlaps);
 
       fiberLogical[i].at(j)->SetVisAttributes(fVisAttrGray);

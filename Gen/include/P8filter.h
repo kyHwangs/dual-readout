@@ -8,7 +8,7 @@ public:
   P8filter(bool on, double etaMax, double thres);
   ~P8filter();
 
-  bool filter(Pythia8::Event& evt, Pythia8::Info& info);
+  bool filter(Pythia8::Event& evt, const Pythia8::Info& info);
 
 private:
   void init();

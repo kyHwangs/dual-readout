@@ -40,8 +40,8 @@ public:
 
     // Alternative method to convert Pythia events into HepMC ones
     bool fill_next_event( Pythia8::Event& pyev, GenEvent* evt,
-                          int ievnum = -1, Pythia8::Info* pyinfo = 0,
-                          Pythia8::Settings* pyset = 0)
+                          int ievnum = -1, const Pythia8::Info* pyinfo = 0,
+                          const Pythia8::Settings* pyset = 0)
     {
 
         // 1. Error if no event passed.
@@ -128,7 +128,7 @@ public:
         }
 
         // If hadronization switched on then no final coloured particles.
-        bool doHadr = (pyset == 0) ? m_free_parton_warnings : pyset->flag("HadronLevel:all") && pyset->flag("HadronLevel:Hadronize");
+        bool doHadr = (pyset == 0) ? m_free_parton_warnings : const_cast<Pythia8::Settings*>(pyset)->flag("HadronLevel:all") && const_cast<Pythia8::Settings*>(pyset)->flag("HadronLevel:Hadronize");
 
         // 4. Check for particles which come from nowhere, i.e. are without
         // mothers or daughters. These need to be attached to a vertex, or else

@@ -22,6 +22,7 @@ target_link_libraries(
   ${FASTJET_DIR}/lib/libfastjet.so
   rootIO
   ${CMAKE_DL_LIBS}
+  z
 )
 
 add_executable(P8generic P8generic.cc ${sources} ${headers})
@@ -33,6 +34,7 @@ target_link_libraries(
   ${FASTJET_DIR}/lib/libfastjet.so
   rootIO
   ${CMAKE_DL_LIBS}
+  z
 )
 
 set(

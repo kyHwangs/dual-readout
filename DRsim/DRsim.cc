@@ -51,9 +51,9 @@ int main(int argc, char** argv) {
   runManager->SetUserInitialization(physicsList);
 
   // opticalPhysics->Configure(kCerenkov, true);
-  // opticalPhysics->Configure(kScintillation, true);
+  // opticalPhysics->Configure(kScintillation, false);
   // opticalPhysics->SetTrackSecondariesFirst(kCerenkov, true);
-  // opticalPhysics->SetTrackSecondariesFirst(kScintillation, true);
+  // opticalPhysics->SetTrackSecondariesFirst(kScintillation, false);
 
   // User action initialization
   runManager->SetUserInitialization(new DRsimActionInitialization(seed,filename));

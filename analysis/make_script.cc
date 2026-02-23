@@ -35,8 +35,6 @@ int main(int argc, char* argv[]) {
   if( !(fs::exists(fLogDir)) ) fs::create_directory(fLogDir);
 
   std::string fRunMacro = R"(#This macro can not be executed standalone
-/vis/disable
-/run/numberOfThreads 1
 /run/initialize
 /run/verbose 1
 

@@ -2,6 +2,8 @@
 
 #include "G4ParticleDefinition.hh"
 #include "G4ParticleTypes.hh"
+#include "G4VProcess.hh"
+#include "G4TrackStatus.hh"
 
 DRsimSteppingAction::DRsimSteppingAction(DRsimEventAction* eventAction)
 : G4UserSteppingAction(), fEventAction(eventAction)
@@ -10,7 +12,15 @@ DRsimSteppingAction::DRsimSteppingAction(DRsimEventAction* eventAction)
 DRsimSteppingAction::~DRsimSteppingAction() {}
 
 void DRsimSteppingAction::UserSteppingAction(const G4Step* step) {
-  if (step->GetTrack()->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return;
+  
+  if (step->GetTrack()->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
+    // std::cout << step->GetTrack()->GetCreatorProcess()->GetProcessName() << std::endl;
+    // if (step->GetTrack()->GetCreatorProcess()->GetProcessName() == "Scintillation") {
+      // step->GetTrack()->SetTrackStatus(G4TrackStatus::fStopAndKill);
+    // }
+    return;
+  }
+
 
   G4Track* track = step->GetTrack();
   G4ParticleDefinition* particle = track->GetDefinition();

@@ -46,6 +46,7 @@ void DRsimEventAction::clear() {
 }
 
 void DRsimEventAction::EndOfEventAction(const G4Event* event) {
+
   G4HCofThisEvent* hce = event->GetHCofThisEvent();
   if (!hce) {
     G4ExceptionDescription msg;
@@ -61,7 +62,8 @@ void DRsimEventAction::EndOfEventAction(const G4Event* event) {
     DRsimSiPMHitsCollection* sipmHC = 0;
 
     if (hce) {
-      if(fSiPMCollID[iSD]>=0) sipmHC = (DRsimSiPMHitsCollection*)(hce->GetHC(fSiPMCollID[iSD]));
+      if(fSiPMCollID[iSD] >= 0) 
+        sipmHC = (DRsimSiPMHitsCollection*)(hce->GetHC(fSiPMCollID[iSD]));
     }
 
     if (sipmHC) {

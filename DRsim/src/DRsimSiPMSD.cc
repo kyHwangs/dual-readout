@@ -27,8 +27,9 @@ fPhiUnit(2*M_PI/(G4float)DRsimDetectorConstruction::sNumZRot), fWavlenStart(900.
 DRsimSiPMSD::~DRsimSiPMSD() {}
 
 void DRsimSiPMSD::Initialize(G4HCofThisEvent* hce) {
-  fHitCollection = new DRsimSiPMHitsCollection(SensitiveDetectorName,collectionName[0]);
-  if (fHCID<0) { fHCID = GetCollectionID(0); }
+  fHitCollection = new DRsimSiPMHitsCollection(SensitiveDetectorName, collectionName[0]);
+  if (fHCID < 0) { fHCID = GetCollectionID(0); }
+
   hce->AddHitsCollection(fHCID,fHitCollection);
 }
 

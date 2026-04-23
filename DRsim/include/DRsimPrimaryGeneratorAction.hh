@@ -26,6 +26,7 @@ public:
 
   void SetPhi(G4double phi) { fPhi = phi; }
 
+  void SetX0(G4double x0) { fX_0 = x0; }
   void SetY0(G4double y0) { fY_0 = y0; }
   void SetZ0(G4double z0) { fZ_0 = z0; }
 
@@ -60,6 +61,7 @@ private:
   G4double fRandX;
   G4double fRandY;
 
+  G4double fX_0;
   G4double fY_0;
   G4double fZ_0;
 

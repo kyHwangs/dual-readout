@@ -48,7 +48,7 @@ private:
   void fiberBarrel(G4int i, G4double deltatheta_, G4LogicalVolume* towerLogical[], std::vector<G4LogicalVolume*> fiberLogical[], std::vector<G4LogicalVolume*> fiberLogical_[]);
 
   void Endcap(G4LogicalVolume* towerLogical[], G4LogicalVolume* PMTGLogical[], G4LogicalVolume* PMTfilterLogical[], G4LogicalVolume* PMTcellLogical[],
-    G4LogicalVolume* PMTcathLogical[], std::vector<G4LogicalVolume*> fiberLogical[], std::vector<G4LogicalVolume*> fiberLogical_[], std::vector<DRsimInterface::DRsimTowerProperty>& towerProps);
+    G4LogicalVolume* PMTcathLogical[], std::vector<G4LogicalVolume*> fiberLogical[], std::vector<G4LogicalVolume*> fiberLogical_[], std::vector<DRsimInterface::DRsimTowerProperty>& towerProps) {};
 
   void fiberEndcap(G4int i, G4double deltatheta, G4LogicalVolume* towerLogical[], std::vector<G4LogicalVolume*> fiberLogical[], std::vector<G4LogicalVolume*> fiberLogical_[]);
 
@@ -83,9 +83,9 @@ private:
 
   char name[20];
   G4String towerName;
-  G4Trap* tower;
-  G4Trap* pmtg;
-  G4Trap* pmtcath;
+  G4Box* tower;
+  G4Box* pmtg;
+  G4Box* pmtcath;
   G4Tubs* fiber;
   G4Tubs* fiber_S;
   G4Tubs* fiber_C;

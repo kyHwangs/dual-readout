@@ -19,6 +19,7 @@ add_executable(analysis analysis.cc ${sources} ${headers})
 add_executable(JER JER.cc ${sources} ${headers})
 add_executable(calib calib.cc ${sources} ${headers})
 add_executable(make_script make_script.cc ${sources} ${headers})
+add_executable(job_summary job_summary.cc ${sources} ${headers})
 
 target_link_libraries(
   analysis
@@ -52,6 +53,14 @@ target_link_libraries(
   ${ROOT_LIBRARIES}
   ${CMAKE_DL_LIBS}
 )
+target_link_libraries(
+  job_summary
+  ${HEPMC_DIR}/lib64/libHepMC3.so
+  ${HEPMC_DIR}/lib64/libHepMC3rootIO.so
+  rootIO
+  ${ROOT_LIBRARIES}
+  ${CMAKE_DL_LIBS}
+)
 
 set(
   analysis_SCRIPTS
@@ -65,4 +74,4 @@ foreach(_script ${analysis_SCRIPTS})
   )
 endforeach()
 
-install(TARGETS make_script analysis JER calib DESTINATION bin)
+install(TARGETS job_summary make_script analysis JER calib DESTINATION bin)

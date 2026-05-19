@@ -29,7 +29,7 @@ G4ThreadLocal G4FieldManager* DRsimDetectorConstruction::fFieldMgr = 0;
 int DRsimDetectorConstruction::sNumBarrel = 52;
 int DRsimDetectorConstruction::sNumEndcap = 40;
 int DRsimDetectorConstruction::sNumZRot = 283;
-double DRsimDetectorConstruction::sTowerH = 2000.;
+double DRsimDetectorConstruction::sTowerH = 2500.;
 
 DRsimDetectorConstruction::DRsimDetectorConstruction()
 : G4VUserDetectorConstruction(), fMessenger(0), fMaterials(NULL) {
@@ -126,7 +126,7 @@ G4VPhysicalVolume* DRsimDetectorConstruction::Construct() {
 
   dimB->Rbool(0);
   fulltheta = 0.;
-  Barrel(towerLogicalBL,PMTGLogicalBL,PMTfilterLogicalBL,PMTcellLogicalBL,PMTcathLogicalBL,fiberLogical_BL,fiberLogical_BL_,fTowerBL);
+  // Barrel(towerLogicalBL,PMTGLogicalBL,PMTfilterLogicalBL,PMTcellLogicalBL,PMTcathLogicalBL,fiberLogical_BL,fiberLogical_BL_,fTowerBL);
 
   // endcap
   dimE = new dimensionE();
@@ -139,13 +139,13 @@ G4VPhysicalVolume* DRsimDetectorConstruction::Construct() {
   fulltheta = 0.95717;
   dimE->Rbool(1);
 
-  Endcap(towerLogicalER,PMTGLogicalER,PMTfilterLogicalER,PMTcellLogicalER,PMTcathLogicalER,fiberLogical_ER,fiberLogical_ER_,fTowerER);
+  // Endcap(towerLogicalER,PMTGLogicalER,PMTfilterLogicalER,PMTcellLogicalER,PMTcathLogicalER,fiberLogical_ER,fiberLogical_ER_,fTowerER);
 
   // endcap L
   fulltheta = 0.95717;
   dimE->Rbool(0);
 
-  Endcap(towerLogicalEL,PMTGLogicalEL,PMTfilterLogicalEL,PMTcellLogicalEL,PMTcathLogicalEL,fiberLogical_EL,fiberLogical_EL_,fTowerEL);
+  // Endcap(towerLogicalEL,PMTGLogicalEL,PMTfilterLogicalEL,PMTcellLogicalEL,PMTcathLogicalEL,fiberLogical_EL,fiberLogical_EL_,fTowerEL);
 
   delete dimE;
   delete dimB;
@@ -164,23 +164,23 @@ void DRsimDetectorConstruction::ConstructSDandField() {
     PMTcathLogicalBR[i]->SetSensitiveDetector(SiPMSDBR);
   }
 
-  for (int i = 0; i < sNumBarrel; i++) {
-    DRsimSiPMSD* SiPMSDBL = new DRsimSiPMSD("BL"+std::to_string(i),"BLC"+std::to_string(i),fTowerBL.at(i));
-    SDman->AddNewDetector(SiPMSDBL);
-    PMTcathLogicalBL[i]->SetSensitiveDetector(SiPMSDBL);
-  }
+  // for (int i = 0; i < sNumBarrel; i++) {
+  //   DRsimSiPMSD* SiPMSDBL = new DRsimSiPMSD("BL"+std::to_string(i),"BLC"+std::to_string(i),fTowerBL.at(i));
+  //   SDman->AddNewDetector(SiPMSDBL);
+  //   PMTcathLogicalBL[i]->SetSensitiveDetector(SiPMSDBL);
+  // }
 
-  for (int i = 0; i < sNumEndcap; i++) {
-    DRsimSiPMSD* SiPMSDER = new DRsimSiPMSD("ER"+std::to_string(i),"ERC"+std::to_string(i),fTowerER.at(i));
-    SDman->AddNewDetector(SiPMSDER);
-    PMTcathLogicalER[i]->SetSensitiveDetector(SiPMSDER);
-  }
+  // for (int i = 0; i < sNumEndcap; i++) {
+  //   DRsimSiPMSD* SiPMSDER = new DRsimSiPMSD("ER"+std::to_string(i),"ERC"+std::to_string(i),fTowerER.at(i));
+  //   SDman->AddNewDetector(SiPMSDER);
+  //   PMTcathLogicalER[i]->SetSensitiveDetector(SiPMSDER);
+  // }
 
-  for (int i = 0; i < sNumEndcap; i++) {
-    DRsimSiPMSD* SiPMSDEL = new DRsimSiPMSD("EL"+std::to_string(i),"ELC"+std::to_string(i),fTowerEL.at(i));
-    SDman->AddNewDetector(SiPMSDEL);
-    PMTcathLogicalEL[i]->SetSensitiveDetector(SiPMSDEL);
-  }
+  // for (int i = 0; i < sNumEndcap; i++) {
+  //   DRsimSiPMSD* SiPMSDEL = new DRsimSiPMSD("EL"+std::to_string(i),"ELC"+std::to_string(i),fTowerEL.at(i));
+  //   SDman->AddNewDetector(SiPMSDEL);
+  //   PMTcathLogicalEL[i]->SetSensitiveDetector(SiPMSDEL);
+  // }
 
   FastOpTransportModel* cerenModel = new FastOpTransportModel("fastOpTransportCeren",fCerenRegion);
   FastOpTransportModel* scintModel = new FastOpTransportModel("fastOpTransportScint",fScintRegion);
@@ -193,35 +193,28 @@ void DRsimDetectorConstruction::ConstructSDandField() {
 void DRsimDetectorConstruction::Barrel(G4LogicalVolume* towerLogical[], G4LogicalVolume* PMTGLogical[], G4LogicalVolume* PMTfilterLogical[], G4LogicalVolume* PMTcellLogical[],
   G4LogicalVolume* PMTcathLogical[], std::vector<G4LogicalVolume*> fiberLogical[], std::vector<G4LogicalVolume*> fiberLogical_[], std::vector<DRsimInterface::DRsimTowerProperty>& towerProps) {
 
-  for (int i = 0; i < sNumBarrel; i++) {
-    float towerTheta = fulltheta + fDThetaBarrel[i]/2.;
-    dimB->SetDeltaTheta(fDThetaBarrel[i]);
-    dimB->SetThetaOfCenter(towerTheta);
-    dimB->CalBasic();
-    dimB->Getpt(pt);
+  for (int i = 0; i < 7; i++) {
+
     towerName = setTowerName(dimB->GetRbool(), "B", i);
 
-    tower = new G4Trap("TowerB",pt);
+    tower = new G4Box("Tower", 99. /2 * mm, 99. / 2 * mm, sTowerH / 2. * mm);
     towerLogical[i] = new G4LogicalVolume(tower,FindMaterial("Copper"),towerName);
 
-    dimB->Getpt_PMTG(pt);
-    pmtg = new G4Trap("PMTGB",pt);
+    pmtg = new G4Box("Tower", 99. / 2 * mm, 99. / 2 * mm, (fPMTT + fFilterT) * mm);
     PMTGLogical[i] = new G4LogicalVolume(pmtg,FindMaterial("G4_AIR"),towerName);
 
-    for(int j=0;j<sNumZRot;j++){
-      new G4PVPlacement(dimB->GetRM(j),dimB->GetOrigin(j),towerLogical[i],towerName,worldLogical,false,j,checkOverlaps);
-      new G4PVPlacement(dimB->GetRM(j),dimB->GetOrigin_PMTG(j),PMTGLogical[i],towerName,worldLogical,false,j,checkOverlaps);
+    for(int j = 0; j < 7; j++){
+      new G4PVPlacement(0, dimB->GetOrigin(i, j),towerLogical[i],towerName,worldLogical,false,j,checkOverlaps);
+      new G4PVPlacement(0, dimB->GetOrigin_PMTG(i, j),PMTGLogical[i],towerName,worldLogical,false,j,checkOverlaps);
     }
 
     dimB->Getpt(pt);
     fiberBarrel(i,fDThetaBarrel[i],towerLogical,fiberLogical,fiberLogical_);
 
-    int iTheta = dimB->GetRbool() ? i : -i-1;
-    float signedTowerTheta = dimB->GetRbool() ? towerTheta : -towerTheta;
     DRsimInterface::DRsimTowerProperty towerProp;
     towerProp.towerXY = fTowerXY;
-    towerProp.towerTheta = std::make_pair(iTheta,signedTowerTheta);
-    towerProp.innerR = dimB->GetInnerR_new();
+    towerProp.towerTheta = std::make_pair(i,i);
+    towerProp.innerR = 2500;
     towerProp.towerH = sTowerH;
     towerProp.dTheta = fDThetaBarrel[i];
     towerProps.push_back(towerProp);
@@ -255,81 +248,81 @@ void DRsimDetectorConstruction::Barrel(G4LogicalVolume* towerLogical[], G4Logica
     G4PVParameterised* filterPhysical = new G4PVParameterised("filterPhysical",PMTfilterLogical[i],filterlayerLogical,kXAxis,fTowerXY.first*fTowerXY.second,filterParam);
     new G4LogicalBorderSurface("filterSurf",filterPhysical,PMTcellPhysical,FindSurface("FilterSurf"));
 
-    fulltheta = fulltheta+fDThetaBarrel[i];
+    // fulltheta = fulltheta+fDThetaBarrel[i];
 
     PMTcathLogical[i]->SetVisAttributes(fVisAttrGreen);
   }
 }
 
-void DRsimDetectorConstruction::Endcap(G4LogicalVolume* towerLogical[], G4LogicalVolume* PMTGLogical[], G4LogicalVolume* PMTfilterLogical[], G4LogicalVolume* PMTcellLogical[],
-  G4LogicalVolume* PMTcathLogical[], std::vector<G4LogicalVolume*> fiberLogical[], std::vector<G4LogicalVolume*> fiberLogical_[], std::vector<DRsimInterface::DRsimTowerProperty>& towerProps) {
+// void DRsimDetectorConstruction::Endcap(G4LogicalVolume* towerLogical[], G4LogicalVolume* PMTGLogical[], G4LogicalVolume* PMTfilterLogical[], G4LogicalVolume* PMTcellLogical[],
+//   G4LogicalVolume* PMTcathLogical[], std::vector<G4LogicalVolume*> fiberLogical[], std::vector<G4LogicalVolume*> fiberLogical_[], std::vector<DRsimInterface::DRsimTowerProperty>& towerProps) {
 
-  for(int i=0;i<sNumEndcap;i++) {
-    float towerTheta = fulltheta + fDThetaEndcap/2.;
-    dimE->SetThetaOfCenter(towerTheta);
-    dimE->CalBasic();
-    dimE->Getpt(pt);
-    towerName = setTowerName(dimE->GetRbool(), "E", i);
+//   for(int i=0;i<sNumEndcap;i++) {
+//     float towerTheta = fulltheta + fDThetaEndcap/2.;
+//     dimE->SetThetaOfCenter(towerTheta);
+//     dimE->CalBasic();
+//     dimE->Getpt(pt);
+//     towerName = setTowerName(dimE->GetRbool(), "E", i);
 
-    tower = new G4Trap("TowerE",pt);
-    towerLogical[i] = new G4LogicalVolume(tower,FindMaterial("Copper"),towerName);
+//     tower = new G4Trap("TowerE",pt);
+//     towerLogical[i] = new G4LogicalVolume(tower,FindMaterial("Copper"),towerName);
 
-    dimE->Getpt_PMTG(pt);
-    pmtg = new G4Trap("PMTGE",pt);
-    PMTGLogical[i] = new G4LogicalVolume(pmtg,FindMaterial("G4_AIR"),towerName);
+//     dimE->Getpt_PMTG(pt);
+//     pmtg = new G4Trap("PMTGE",pt);
+//     PMTGLogical[i] = new G4LogicalVolume(pmtg,FindMaterial("G4_AIR"),towerName);
 
-    for(int j=0;j<sNumZRot;j++){
-      new G4PVPlacement(dimE->GetRM(j),dimE->GetOrigin(j),towerLogical[i],towerName,worldLogical,false,j,checkOverlaps);
-      new G4PVPlacement(dimE->GetRM(j),dimE->GetOrigin_PMTG(j),PMTGLogical[i],towerName,worldLogical,false,j,checkOverlaps);
-    }
+//     for(int j=0;j<sNumZRot;j++){
+//       new G4PVPlacement(dimE->GetRM(j),dimE->GetOrigin(j),towerLogical[i],towerName,worldLogical,false,j,checkOverlaps);
+//       new G4PVPlacement(dimE->GetRM(j),dimE->GetOrigin_PMTG(j),PMTGLogical[i],towerName,worldLogical,false,j,checkOverlaps);
+//     }
 
-    dimE->Getpt(pt);
-    fiberEndcap(i,fDThetaEndcap,towerLogical,fiberLogical,fiberLogical_);
+//     dimE->Getpt(pt);
+//     fiberEndcap(i,fDThetaEndcap,towerLogical,fiberLogical,fiberLogical_);
 
-    int iTheta = dimE->GetRbool() ? i+sNumBarrel : -i-sNumBarrel-1;
-    float signedTowerTheta = dimE->GetRbool() ? towerTheta : -towerTheta;
-    DRsimInterface::DRsimTowerProperty towerProp;
-    towerProp.towerXY = fTowerXY;
-    towerProp.towerTheta = std::make_pair(iTheta,signedTowerTheta);
-    towerProp.innerR = dimE->GetInnerR_new();
-    towerProp.towerH = sTowerH;
-    towerProp.dTheta = fDThetaEndcap;
-    towerProps.push_back(towerProp);
+//     int iTheta = dimE->GetRbool() ? i+sNumBarrel : -i-sNumBarrel-1;
+//     float signedTowerTheta = dimE->GetRbool() ? towerTheta : -towerTheta;
+//     DRsimInterface::DRsimTowerProperty towerProp;
+//     towerProp.towerXY = fTowerXY;
+//     towerProp.towerTheta = std::make_pair(iTheta,signedTowerTheta);
+//     towerProp.innerR = dimE->GetInnerR_new();
+//     towerProp.towerH = sTowerH;
+//     towerProp.dTheta = fDThetaEndcap;
+//     towerProps.push_back(towerProp);
 
-    G4VSolid* SiPMlayerSolid = new G4Box("SiPMlayerSolid",fTowerXY.first*1.5/2.*mm,fTowerXY.second*1.5/2.*mm,fPMTT/2.);
-    G4LogicalVolume* SiPMlayerLogical = new G4LogicalVolume(SiPMlayerSolid,FindMaterial("G4_POLYVINYL_CHLORIDE"),"SiPMlayerLogical");
-    new G4PVPlacement(0,G4ThreeVector(0.,0.,fFilterT/2.),SiPMlayerLogical,"SiPMlayerPhysical",PMTGLogical[i],false,0,checkOverlaps);
+//     G4VSolid* SiPMlayerSolid = new G4Box("SiPMlayerSolid",fTowerXY.first*1.5/2.*mm,fTowerXY.second*1.5/2.*mm,fPMTT/2.);
+//     G4LogicalVolume* SiPMlayerLogical = new G4LogicalVolume(SiPMlayerSolid,FindMaterial("G4_POLYVINYL_CHLORIDE"),"SiPMlayerLogical");
+//     new G4PVPlacement(0,G4ThreeVector(0.,0.,fFilterT/2.),SiPMlayerLogical,"SiPMlayerPhysical",PMTGLogical[i],false,0,checkOverlaps);
 
-    G4VSolid* filterlayerSolid = new G4Box("filterlayerSolid",fTowerXY.first*1.5/2.*mm,fTowerXY.second*1.5/2.*mm,fFilterT/2.);
-    G4LogicalVolume* filterlayerLogical = new G4LogicalVolume(filterlayerSolid,FindMaterial("G4_POLYVINYL_CHLORIDE"),"filterlayerLogical");
-    new G4PVPlacement(0,G4ThreeVector(0.,0.,-fPMTT/2.),filterlayerLogical,"filterlayerPhysical",PMTGLogical[i],false,0,checkOverlaps);
+//     G4VSolid* filterlayerSolid = new G4Box("filterlayerSolid",fTowerXY.first*1.5/2.*mm,fTowerXY.second*1.5/2.*mm,fFilterT/2.);
+//     G4LogicalVolume* filterlayerLogical = new G4LogicalVolume(filterlayerSolid,FindMaterial("G4_POLYVINYL_CHLORIDE"),"filterlayerLogical");
+//     new G4PVPlacement(0,G4ThreeVector(0.,0.,-fPMTT/2.),filterlayerLogical,"filterlayerPhysical",PMTGLogical[i],false,0,checkOverlaps);
 
-    G4VSolid* PMTcellSolid = new G4Box("PMTcellSolid",1.2/2.*mm,1.2/2.*mm,fPMTT/2.);
-    PMTcellLogical[i] = new G4LogicalVolume(PMTcellSolid,FindMaterial("Glass"),"PMTcellLogical");
+//     G4VSolid* PMTcellSolid = new G4Box("PMTcellSolid",1.2/2.*mm,1.2/2.*mm,fPMTT/2.);
+//     PMTcellLogical[i] = new G4LogicalVolume(PMTcellSolid,FindMaterial("Glass"),"PMTcellLogical");
 
-    DRsimCellParameterisation* PMTcellParam = new DRsimCellParameterisation(fTowerXY.first,fTowerXY.second);
-    G4PVParameterised* PMTcellPhysical = new G4PVParameterised("PMTcellPhysical",PMTcellLogical[i],SiPMlayerLogical,kXAxis,fTowerXY.first*fTowerXY.second,PMTcellParam);
+//     DRsimCellParameterisation* PMTcellParam = new DRsimCellParameterisation(fTowerXY.first,fTowerXY.second);
+//     G4PVParameterised* PMTcellPhysical = new G4PVParameterised("PMTcellPhysical",PMTcellLogical[i],SiPMlayerLogical,kXAxis,fTowerXY.first*fTowerXY.second,PMTcellParam);
 
-    G4VSolid* PMTcathSolid = new G4Box("PMTcathSolid",1.2/2.*mm,1.2/2.*mm,fSiPMT/2.*mm);
-    PMTcathLogical[i] = new G4LogicalVolume(PMTcathSolid,FindMaterial("Silicon"),"PMTcathLogical");
-    new G4PVPlacement(0,G4ThreeVector(0.,0.,(fPMTT-fSiPMT)/2.*mm),PMTcathLogical[i],"PMTcathPhysical",PMTcellLogical[i],false,0,checkOverlaps);
-    new G4LogicalSkinSurface("Photocath_surf",PMTcathLogical[i],FindSurface("SiPMSurf"));
+//     G4VSolid* PMTcathSolid = new G4Box("PMTcathSolid",1.2/2.*mm,1.2/2.*mm,fSiPMT/2.*mm);
+//     PMTcathLogical[i] = new G4LogicalVolume(PMTcathSolid,FindMaterial("Silicon"),"PMTcathLogical");
+//     new G4PVPlacement(0,G4ThreeVector(0.,0.,(fPMTT-fSiPMT)/2.*mm),PMTcathLogical[i],"PMTcathPhysical",PMTcellLogical[i],false,0,checkOverlaps);
+//     new G4LogicalSkinSurface("Photocath_surf",PMTcathLogical[i],FindSurface("SiPMSurf"));
 
-    G4VSolid* filterSolid = new G4Box("filterSolid",1.2/2.*mm,1.2/2.*mm,fFilterT/2.);
-    PMTfilterLogical[i] = new G4LogicalVolume(filterSolid,FindMaterial("Glass"),"PMTfilterLogical");
+//     G4VSolid* filterSolid = new G4Box("filterSolid",1.2/2.*mm,1.2/2.*mm,fFilterT/2.);
+//     PMTfilterLogical[i] = new G4LogicalVolume(filterSolid,FindMaterial("Glass"),"PMTfilterLogical");
 
-    DRsimFilterParameterisation* filterParam = new DRsimFilterParameterisation(fTowerXY.first,fTowerXY.second,FindMaterial("Glass"),FindMaterial("Gelatin"));
-    filterParam->SetFilterVis(fVisAttrOrange);
-    filterParam->SetGlassVis(fVisAttrWhite);
+//     DRsimFilterParameterisation* filterParam = new DRsimFilterParameterisation(fTowerXY.first,fTowerXY.second,FindMaterial("Glass"),FindMaterial("Gelatin"));
+//     filterParam->SetFilterVis(fVisAttrOrange);
+//     filterParam->SetGlassVis(fVisAttrWhite);
 
-    G4PVParameterised* filterPhysical = new G4PVParameterised("filterPhysical",PMTfilterLogical[i],filterlayerLogical,kXAxis,fTowerXY.first*fTowerXY.second,filterParam);
-    new G4LogicalBorderSurface("filterSurf",filterPhysical,PMTcellPhysical,FindSurface("FilterSurf"));
+//     G4PVParameterised* filterPhysical = new G4PVParameterised("filterPhysical",PMTfilterLogical[i],filterlayerLogical,kXAxis,fTowerXY.first*fTowerXY.second,filterParam);
+//     new G4LogicalBorderSurface("filterSurf",filterPhysical,PMTcellPhysical,FindSurface("FilterSurf"));
 
-    fulltheta = fulltheta+fDThetaEndcap;
+//     fulltheta = fulltheta+fDThetaEndcap;
 
-    PMTcathLogical[i]->SetVisAttributes(fVisAttrGreen);
-  }
-}
+//     PMTcathLogical[i]->SetVisAttributes(fVisAttrGreen);
+//   }
+// }
 
 void DRsimDetectorConstruction::DefineCommands() {}
 
@@ -338,16 +331,8 @@ void DRsimDetectorConstruction::fiberBarrel(G4int i, G4double deltatheta_,G4Logi
   fFiberX.clear();
   fFiberY.clear();
 
-  v1 = dimB->GetV1();
-  v2 = dimB->GetV2();
-  v3 = dimB->GetV3();
-  v4 = dimB->GetV4();
-
-  innerSide_half = dimB->GetInnerR_new()*tan(deltatheta_/2.);
-  outerSide_half = (dimB->GetInnerR_new()+sTowerH)*tan(deltatheta_/2.);
-
-  int numx = (int)(((v4.getX()*tan(phi_unit/2.)*2)-1.2*mm)/(1.5*mm)) + 1;
-  int numy = (int)((outerSide_half*2-1.2*mm)/(1.5*mm)) + 1;
+  int numx = 99. / 1.5;
+  int numy = 99. / 1.5;
   fTowerXY = std::make_pair(numx,numy);
 
   for (int j = 0; j < numy; j++) {
@@ -363,43 +348,23 @@ void DRsimDetectorConstruction::fiberBarrel(G4int i, G4double deltatheta_,G4Logi
     G4int column = j % numx;
     G4int row = j / numx;
 
-    if ( DRsimInterface::IsCerenkov(column,row) ) { //c fibre
-      intersect = new G4IntersectionSolid("fiber_",fiber,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
-      G4LogicalVolume* cladLogical = new G4LogicalVolume(intersect,FindMaterial("FluorinatedPolymer"),name);
-      fiberLogical[i].push_back(cladLogical);
-      new G4PVPlacement(0,G4ThreeVector(fFiberX.at(j),fFiberY.at(j),0),fiberLogical[i].at(j),name,towerLogical[i],false,j,checkOverlaps);
+    intersect = new G4IntersectionSolid("fiber_",fiber,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
+    G4LogicalVolume* cladLogical = new G4LogicalVolume(intersect,FindMaterial("PMMA"),name);
+    fiberLogical[i].push_back(cladLogical);
+    new G4PVPlacement(0,G4ThreeVector(fFiberX.at(j),fFiberY.at(j),0),fiberLogical[i].at(j),name,towerLogical[i],false,j,checkOverlaps);
 
-      intersect_ = new G4IntersectionSolid("fiber_",fiberC,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
-      G4LogicalVolume* coreLogical = new G4LogicalVolume(intersect_,FindMaterial("PMMA"),name);
-      fiberLogical_[i].push_back(coreLogical);
-      new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),fiberLogical_[i].at(j),name,fiberLogical[i].at(j),false,j,checkOverlaps);
+    intersect_ = new G4IntersectionSolid("fiber_",fiberS,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
+    G4LogicalVolume* coreLogical = new G4LogicalVolume(intersect_,FindMaterial("Polystyrene"),name);
+    fiberLogical_[i].push_back(coreLogical);
+    new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),fiberLogical_[i].at(j),name,fiberLogical[i].at(j),false,j,checkOverlaps);
 
-      fCerenRegion->AddRootLogicalVolume(cladLogical);
-      fCerenRegion->AddRootLogicalVolume(coreLogical);
-      cladLogical->SetRegion(fCerenRegion);
-      coreLogical->SetRegion(fCerenRegion);
+    fScintRegion->AddRootLogicalVolume(cladLogical);
+    fScintRegion->AddRootLogicalVolume(coreLogical);
+    cladLogical->SetRegion(fScintRegion);
+    coreLogical->SetRegion(fScintRegion);
 
-      fiberLogical[i].at(j)->SetVisAttributes(fVisAttrGray);
-      fiberLogical_[i].at(j)->SetVisAttributes(fVisAttrBlue);
-    } else { // s fibre
-      intersect = new G4IntersectionSolid("fiber_",fiber,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
-      G4LogicalVolume* cladLogical = new G4LogicalVolume(intersect,FindMaterial("PMMA"),name);
-      fiberLogical[i].push_back(cladLogical);
-      new G4PVPlacement(0,G4ThreeVector(fFiberX.at(j),fFiberY.at(j),0),fiberLogical[i].at(j),name,towerLogical[i],false,j,checkOverlaps);
-
-      intersect_ = new G4IntersectionSolid("fiber_",fiberS,tower,0,G4ThreeVector(-fFiberX.at(j),-fFiberY.at(j),0.));
-      G4LogicalVolume* coreLogical = new G4LogicalVolume(intersect_,FindMaterial("Polystyrene"),name);
-      fiberLogical_[i].push_back(coreLogical);
-      new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),fiberLogical_[i].at(j),name,fiberLogical[i].at(j),false,j,checkOverlaps);
-
-      fScintRegion->AddRootLogicalVolume(cladLogical);
-      fScintRegion->AddRootLogicalVolume(coreLogical);
-      cladLogical->SetRegion(fScintRegion);
-      coreLogical->SetRegion(fScintRegion);
-
-      fiberLogical[i].at(j)->SetVisAttributes(fVisAttrGray);
-      fiberLogical_[i].at(j)->SetVisAttributes(fVisAttrOrange);
-    }
+    fiberLogical[i].at(j)->SetVisAttributes(fVisAttrGray);
+    fiberLogical_[i].at(j)->SetVisAttributes(fVisAttrOrange);
   }
 }
 

@@ -90,8 +90,8 @@ private:
 
   char name[20];
   G4String towerName;
-  G4Trap* tower;
-  G4Trap* pmtg;
+  G4Box* tower;
+  G4Box* pmtg;
   G4Trap* pmtcath;
   G4Tubs* fiber;
   G4Tubs* fiber_S;

@@ -131,6 +131,17 @@ G4ThreeVector dimensionB::GetOrigin(G4int i) {
   }
 }
 
+G4ThreeVector dimensionB::GetOrigin(G4int i, G4int j) {
+
+  return G4ThreeVector(99. * (j - 3.), 99. * (i - 3.), 1500. + ftower_height / 2.);
+}
+
+G4ThreeVector dimensionB::GetOrigin_PMTG(G4int i, G4int j) {
+
+  return G4ThreeVector(99. * (j - 3.), 99. * (i - 3.), 1500. + ftower_height + fPMTT / 2.);
+}
+
+
 G4ThreeVector dimensionB::GetOrigin_PMTG(G4int i) {
   if(fcalbasicbool==0) {
     cout<<"fcalbasicbool = 0"<<endl;

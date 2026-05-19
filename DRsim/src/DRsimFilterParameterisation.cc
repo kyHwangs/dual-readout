@@ -35,8 +35,8 @@ G4Material* DRsimFilterParameterisation::ComputeMaterial(const G4int copyNo, G4V
   G4int column = copyNo % fNumx;
   G4int row = copyNo / fNumx;
 
-  if ( !DRsimInterface::IsCerenkov(column,row) ) {
-    if (fFilterVis) physVol->GetLogicalVolume()->SetVisAttributes(fFilterVis);
+  if (fFilterVis) {
+    physVol->GetLogicalVolume()->SetVisAttributes(fFilterVis);
     return fFilterMat;
   }
 

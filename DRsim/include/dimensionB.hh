@@ -38,9 +38,11 @@ public:
   G4ThreeVector GetV4();
 
   G4ThreeVector GetOrigin(G4int i);
+  G4ThreeVector GetOrigin(G4int i, G4int j);
   void Getpt(G4ThreeVector *pt);
 
   G4ThreeVector GetOrigin_PMTG(G4int i);
+  G4ThreeVector GetOrigin_PMTG(G4int i, G4int j);
   void Getpt_PMTG(G4ThreeVector *pt);
 
   G4RotationMatrix* GetRM(G4int i);

@@ -132,15 +132,15 @@ void DRsimPrimaryGeneratorAction::GeneratePrimaries(G4Event* event) {
     return;
   }
 
-  G4double y = (G4UniformRand()-0.5)*fRandX + fY_0;//- 3.142*cm;//
-  G4double z = (G4UniformRand()-0.5)*fRandY + fZ_0;//- 4.7135*cm;//10x10 mm^2
-  fOrg.set(0,y,z);
+  G4double x = (G4UniformRand()-0.5) * fRandX + fX_0;//- 3.142*cm;//
+  G4double y = (G4UniformRand()-0.5) * fRandY + fY_0;//- 4.7135*cm;//10x10 mm^2
+  fOrg.set(x,y,-1500. * mm);
 
   fParticleGun->SetParticlePosition(fOrg); // http://www.apc.univ-paris7.fr/~franco/g4doxy/html/classG4VPrimaryGenerator.html
 
-  fDirection.setREtaPhi(1.,0.,0.);
-  fDirection.rotateY(fTheta);
-  fDirection.rotateZ(fPhi);
+  fDirection.setRThetaPhi(1.,0.,0.);
+  // fDirection.rotateY(fTheta);
+  // fDirection.rotateZ(fPhi);
 
   fParticleGun->SetParticleMomentumDirection(fDirection);
 
@@ -161,6 +161,10 @@ void DRsimPrimaryGeneratorAction::DefineCommands() {
   G4GenericMessenger::Command& phiCmd = fMessenger->DeclareMethodWithUnit("phi","rad",&DRsimPrimaryGeneratorAction::SetPhi,"phi of beam");
   phiCmd.SetParameterName("phi",true);
   phiCmd.SetDefaultValue("0.");
+  
+  G4GenericMessenger::Command& x0Cmd = fMessenger->DeclareMethodWithUnit("x0","cm",&DRsimPrimaryGeneratorAction::SetX0,"x_0 of beam");
+  x0Cmd.SetParameterName("x0",true);
+  x0Cmd.SetDefaultValue("0.");
 
   G4GenericMessenger::Command& y0Cmd = fMessenger->DeclareMethodWithUnit("y0","cm",&DRsimPrimaryGeneratorAction::SetY0,"y_0 of beam");
   y0Cmd.SetParameterName("y0",true);

@@ -161,10 +161,10 @@ void DRsimMaterials::CreateMaterials() {
   mpPS = new G4MaterialPropertiesTable();
   mpPS->AddProperty("RINDEX",opEn,RI_PS,nEnt);
   mpPS->AddProperty("ABSLENGTH",opEn,AbsLen_PS,nEnt);
-  mpPS->AddProperty("FASTCOMPONENT",opEn,scintFast_PS,nEnt);
+  mpPS->AddProperty("SCINTILLATIONCOMPONENT1",opEn,scintFast_PS,nEnt);
   mpPS->AddConstProperty("SCINTILLATIONYIELD",13.9/keV);
   mpPS->AddConstProperty("RESOLUTIONSCALE",1.0);
-  mpPS->AddConstProperty("FASTTIMECONSTANT",2.8*ns);
+  mpPS->AddConstProperty("SCINTILLATIONTIMECONSTANT1",2.8*ns);
   fPS->SetMaterialPropertiesTable(mpPS);
   fPS->GetIonisation()->SetBirksConstant(0.126*mm/MeV);
 
@@ -189,13 +189,22 @@ void DRsimMaterials::CreateMaterials() {
   fSiPMSurf = new G4OpticalSurface("SiPMSurf",glisur,polished,dielectric_metal);
   fSiPMSurf->SetMaterialPropertiesTable(mpSiPM);
 
+  // G4double filterEff[nEnt] = { // Kodak Wratten #9
+  //   0.903, 0.903, 0.903, // 900, 850, 800
+  //   0.903, 0.903, 0.903, 0.902, 0.901, 0.898, // 750, 725, 700, 675, 650, 625
+  //   0.895, 0.893, 0.891, 0.888, 0.883, 0.870, 0.838, 0.760, 0.62 , 0.488, // 600, 590, 580, 570, 560, 550, 540, 530, 520, 510
+  //   0.345, 0.207, 0.083, 0.018, 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , // 500, 490, 480, 470, 460, 450, 440, 430, 420, 400
+  //   0.0  , 0.0 // 350, 300
+  // };
+
   G4double filterEff[nEnt] = { // Kodak Wratten #9
-    0.903, 0.903, 0.903, // 900, 850, 800
-    0.903, 0.903, 0.903, 0.902, 0.901, 0.898, // 750, 725, 700, 675, 650, 625
-    0.895, 0.893, 0.891, 0.888, 0.883, 0.870, 0.838, 0.760, 0.62 , 0.488, // 600, 590, 580, 570, 560, 550, 540, 530, 520, 510
-    0.345, 0.207, 0.083, 0.018, 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , // 500, 490, 480, 470, 460, 450, 440, 430, 420, 400
-    0.0  , 0.0 // 350, 300
+    1.0, 1.0, 1.0, // 900, 850, 800
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, // 750, 725, 700, 675, 650, 625
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, // 600, 590, 580, 570, 560, 550, 540, 530, 520, 510
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, // 500, 490, 480, 470, 460, 450, 440, 430, 420, 400
+    1.0, 1.0 // 350, 300
   };
+
   G4double filterRef[nEnt]; std::fill_n(filterRef,nEnt,0.);
   G4double RI_gel[nEnt]; std::fill_n(RI_gel,nEnt,1.52);
   mpFilter = new G4MaterialPropertiesTable();

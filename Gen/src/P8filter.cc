@@ -12,7 +12,7 @@ void P8filter::init() {
   fSum = 0.;
 }
 
-bool P8filter::filter(Pythia8::Event& evt, Pythia8::Info& info) {
+bool P8filter::filter(Pythia8::Event& evt, const Pythia8::Info& info) {
   if (!fOn) return true;
 
   init();

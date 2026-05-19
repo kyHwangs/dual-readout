@@ -158,7 +158,7 @@ void DRsimDetectorConstruction::ConstructSDandField() {
   G4String SiPMName = "SiPMSD";
 
   // Not a memory leak - SDs are deleted by G4SDManager. Deleting them manually will cause double delete!
-  for (int i = 0; i < sNumBarrel; i++) {
+  for (int i = 0; i < 7; i++) {
     DRsimSiPMSD* SiPMSDBR = new DRsimSiPMSD("BR"+std::to_string(i),"BRC"+std::to_string(i),fTowerBR.at(i));
     SDman->AddNewDetector(SiPMSDBR);
     PMTcathLogicalBR[i]->SetSensitiveDetector(SiPMSDBR);

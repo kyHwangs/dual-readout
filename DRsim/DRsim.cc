@@ -13,6 +13,7 @@
 #include "G4FastSimulationPhysics.hh"
 #include "FTFP_BERT.hh"
 #include "Randomize.hh"
+#include "G4OpticalParameters.hh"
 
 #ifdef G4VIS_USE
 #include "G4VisExecutive.hh"
@@ -52,10 +53,19 @@ int main(int argc, char** argv) {
 
   G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
   physicsList->RegisterPhysics(opticalPhysics);
-  opticalPhysics->Configure(kCerenkov, true);
-  opticalPhysics->Configure(kScintillation, true);
-  opticalPhysics->SetTrackSecondariesFirst(kCerenkov, true);
-  opticalPhysics->SetTrackSecondariesFirst(kScintillation, true);
+  // opticalPhysics->Configure(kCerenkov, true);
+  // opticalPhysics->Configure(kScintillation, true);
+  // opticalPhysics->SetTrackSecondariesFirst(kCerenkov, true);
+  // opticalPhysics->SetTrackSecondariesFirst(kScintillation, true);
+
+  auto* opticalParams = G4OpticalParameters::Instance();
+  opticalParams->SetBoundaryInvokeSD(true);
+  opticalParams->SetProcessActivation("Cerenkov", true);
+  opticalParams->SetProcessActivation("Scintillation", true);
+  opticalParams->SetCerenkovTrackSecondariesFirst(true);
+  opticalParams->SetScintTrackSecondariesFirst(true);
+
+  runManager->SetUserInitialization(physicsList);
 
   G4FastSimulationPhysics* fastsimPhysics = new G4FastSimulationPhysics();
   fastsimPhysics->ActivateFastSimulation("opticalphoton");

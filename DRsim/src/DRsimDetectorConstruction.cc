@@ -182,10 +182,10 @@ void DRsimDetectorConstruction::ConstructSDandField() {
   //   PMTcathLogicalEL[i]->SetSensitiveDetector(SiPMSDEL);
   // }
 
-  FastOpTransportModel* cerenModel = new FastOpTransportModel("fastOpTransportCeren",fCerenRegion);
+  // FastOpTransportModel* cerenModel = new FastOpTransportModel("fastOpTransportCeren",fCerenRegion);
   FastOpTransportModel* scintModel = new FastOpTransportModel("fastOpTransportScint",fScintRegion);
-  cerenModel->SetFiberLength(DRsimDetectorConstruction::sTowerH);
-  cerenModel->SetCoreMaterial(FindMaterial("PMMA"));
+  // cerenModel->SetFiberLength(DRsimDetectorConstruction::sTowerH);
+  // cerenModel->SetCoreMaterial(FindMaterial("PMMA"));
   scintModel->SetFiberLength(DRsimDetectorConstruction::sTowerH);
   scintModel->SetCoreMaterial(FindMaterial("Polystyrene"));
 }
@@ -216,7 +216,7 @@ void DRsimDetectorConstruction::Barrel(G4LogicalVolume* towerLogical[], G4Logica
     towerProp.towerTheta = std::make_pair(i,i);
     towerProp.innerR = 2500;
     towerProp.towerH = sTowerH;
-    towerProp.dTheta = fDThetaBarrel[i];
+    towerProp.dTheta = 0;
     towerProps.push_back(towerProp);
 
     G4VSolid* SiPMlayerSolid = new G4Box("SiPMlayerSolid",fTowerXY.first*1.5/2.*mm,fTowerXY.second*1.5/2.*mm,fPMTT/2.);

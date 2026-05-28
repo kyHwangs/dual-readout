@@ -1,6 +1,10 @@
 #ifndef DRsimEventAction_h
 #define DRsimEventAction_h 1
 
+#include <chrono>
+#include <format>
+#include <iostream>
+
 #include "DRsimInterface.h"
 #include "DRsimSiPMHit.hh"
 
@@ -26,6 +30,8 @@ private:
   void fillHits(DRsimSiPMHit* hit);
   void fillPtcs(G4PrimaryVertex* vtx, G4PrimaryParticle* ptc);
   void queue();
+
+  std::chrono::system_clock::time_point fTimeBegin;
 
   DRsimInterface::DRsimEventData* fEventData;
   std::map<toweriTiP, DRsimInterface::DRsimTowerData> fTowerMap;

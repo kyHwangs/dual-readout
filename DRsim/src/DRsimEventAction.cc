@@ -37,6 +37,8 @@ void DRsimEventAction::BeginOfEventAction(const G4Event*) {
   // }
 
   fEventData = new DRsimInterface::DRsimEventData();
+
+  fTimeBegin = std::chrono::system_clock::now();
 }
 
 void DRsimEventAction::clear() {
@@ -46,6 +48,14 @@ void DRsimEventAction::clear() {
 }
 
 void DRsimEventAction::EndOfEventAction(const G4Event* event) {
+  auto fTimeEnd = std::chrono::system_clock::now();
+
+  std::cout << std::format("{}\n", fTimeBegin) << std::endl;
+  std::cout << std::format("{}\n", fTimeEnd) << std::endl;
+  
+  std::chrono::seconds time_duration = std::chrono::duration_cast<std::chrono::seconds>(fTimeEnd - fTimeBegin);
+  std::cout << "Event time: " << time_duration.count() << " seconds" << std::endl;
+
   G4HCofThisEvent* hce = event->GetHCofThisEvent();
   if (!hce) {
     G4ExceptionDescription msg;

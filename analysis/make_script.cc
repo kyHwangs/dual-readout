@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
   if( !(fs::exists(fLogDir)) ) fs::create_directory(fLogDir);
 
   std::string fRunMacro = R"(#This macro can not be executed standalone
-/vis/disable
+
 /run/numberOfThreads 1
 /run/initialize
 /run/verbose 1
@@ -61,8 +61,9 @@ int main(int argc, char* argv[]) {
     return -1;
   }
   
-  std::string fCondorExcutable = R"(#! /bin/sh
-cd )" + fBaseDir + R"(
+  std::string fCondorExcutable = R"(#! /bin/bash
+
+lscpu | grep "Model name"
 
 source /cvmfs/sft.cern.ch/lcg/views/LCG_107/x86_64-el9-gcc13-opt/setup.sh
 
@@ -74,17 +75,17 @@ export PYTHIA8=/cvmfs/sft.cern.ch/lcg/releases/MCGenerators/pythia8/313-ba28f/x8
 export PYTHIA8DATA=/cvmfs/sft.cern.ch/lcg/releases/MCGenerators/pythia8/313-ba28f/x86_64-el9-gcc13-opt/share/Pythia8/xmldoc
 export ROOT_INCLUDE_PATH=/cvmfs/sft.cern.ch/lcg/releases/ROOT/6.34.02-18eb6/x86_64-el9-gcc13-opt/include:$ROOT_INCLUDE_PATH
 
-export INSTALL_DIR_PATH=$PWD/install
+export INSTALL_DIR_PATH=$PWD
 export PATH=$PATH:$INSTALL_DIR_PATH/lib:$INSTALL_DIR_PATH/bin
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INSTALL_DIR_PATH/lib
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HEPMC_DIR/lib64:$FASTJET_DIR/lib:$PYTHIA_DIR/lib
 
-cd )" + fConfigBaseDir + R"(
+export HOME="${_CONDOR_SCRATCH_DIR:-$PWD}"
 
-)" + fInstallBaseDir + R"(/bin/DRsim \
-)" + fConfigBaseDir + R"(/run_macro.mac \
-$1 )" + fRootBaseDir + R"(/output
+./bin/DRsim \
+run_macro.mac \
+$1 output
 )";  
 
   std::string fConfigWrapper = fConfigBaseDir + "/condor_wraper.sh";
@@ -99,11 +100,13 @@ $1 )" + fRootBaseDir + R"(/output
 
   std::string fCondorSubmit = R"(universe            = vanilla
 executable          = condor_wraper.sh
-arguments           = $(ProcId)
-output              = )" + fLogBaseDir + R"(/out_$(ProcId).out
-error               = )" + fLogBaseDir + R"(/err_$(ProcId).err
-log                 = )" + fLogBaseDir + R"(/log_$(ProcId).log
-request_memory      = 3 GB
+ProcOffset          = $(Process)
+ProcOffsetInt       = $INT(ProcOffset)
+arguments           = $(ProcOffsetInt)
+output              = )" + fLogBaseDir + R"(/out_$(ProcOffsetInt).out
+error               = )" + fLogBaseDir + R"(/err_$(ProcOffsetInt).err
+log                 = )" + fLogBaseDir + R"(/log_$(ProcOffsetInt).log
+request_memory      = 300 MB
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT

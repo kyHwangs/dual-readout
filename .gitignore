@@ -1,0 +1,9 @@
+/build/
+/install/
+
+.DS_Store  
+*.class
+*.root
+*.log
+*.out
+*.err

@@ -18,6 +18,7 @@ include(${ROOT_USE_FILE})
 add_executable(calib calib.cc ${sources} ${headers})
 add_executable(make_script make_script.cc ${sources} ${headers})
 add_executable(job_summary job_summary.cc ${sources} ${headers})
+add_executable(make_cputime make_cputime.cc ${sources} ${headers})
 
 target_link_libraries(
   job_summary
@@ -43,6 +44,14 @@ target_link_libraries(
   ${ROOT_LIBRARIES}
   ${CMAKE_DL_LIBS}
 )
+target_link_libraries(
+  make_cputime
+  ${HEPMC_DIR}/lib64/libHepMC3.so
+  ${HEPMC_DIR}/lib64/libHepMC3rootIO.so
+  rootIO
+  ${ROOT_LIBRARIES}
+  ${CMAKE_DL_LIBS}
+)
 set(
   analysis_SCRIPTS
 )
@@ -55,4 +64,4 @@ foreach(_script ${analysis_SCRIPTS})
   )
 endforeach()
 
-install(TARGETS job_summary make_script calib DESTINATION bin)
+install(TARGETS job_summary make_script calib make_cputime DESTINATION bin)

@@ -15,8 +15,8 @@ int main(int argc, char* argv[]) {
   }
 
   int nFiles = std::stoi(argv[1]);
-  int startIdx = (argc >= 3) ? std::stoi(argv[2]) : 0;
-  std::string fInputBase = "./root/output_";
+  std::string fInputBase = (argc >= 3) ? argv[2] : "./root/output_";
+  int startIdx = (argc >= 4) ? std::stoi(argv[3]) : 0;
 
   // Suppress ROOT's verbose warnings; only show errors and above
   gErrorIgnoreLevel = kError;

@@ -52,8 +52,8 @@ int main(int argc, char* argv[]) {
   TH1I* Shit = new TH1I("S_Hit","hits of Scintillation ch",100,0.,40000.);
   Shit->Sumw2(); Shit->SetLineColor(kRed); Shit->SetLineWidth(2);
 
-  RootInterface<DRsimInterface::DRsimEventData>* drInterface = new RootInterface<DRsimInterface::DRsimEventData>(std::string(filename)+".root");
-  drInterface->set("DRsim","DRsimEventData");
+  RootInterface<DRsimInterface::DRsimEventData>* drInterface = new RootInterface<DRsimInterface::DRsimEventData>(std::string(filename)+".root", false);
+  drInterface->GetChain("DRsim");
 
   unsigned int entries = drInterface->entries();
   while (drInterface->numEvt() < entries) {

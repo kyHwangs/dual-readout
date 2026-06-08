@@ -106,7 +106,10 @@ arguments           = $(ProcOffsetInt)
 output              = )" + fLogBaseDir + R"(/out_$(ProcOffsetInt).out
 error               = )" + fLogBaseDir + R"(/err_$(ProcOffsetInt).err
 log                 = )" + fLogBaseDir + R"(/log_$(ProcOffsetInt).log
-request_memory      = 300 MB
+
+accounting_group    = group_fcc
+
+request_memory      = 200 MB
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT

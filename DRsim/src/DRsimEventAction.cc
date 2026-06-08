@@ -53,7 +53,7 @@ void DRsimEventAction::EndOfEventAction(const G4Event* event) {
   std::cout << std::format("{}\n", fTimeBegin) << std::endl;
   std::cout << std::format("{}\n", fTimeEnd) << std::endl;
   
-  std::chrono::seconds time_duration = std::chrono::duration_cast<std::chrono::seconds>(fTimeEnd - fTimeBegin);
+  std::chrono::duration<double> time_duration = fTimeEnd - fTimeBegin;
   std::cout << "Event time: " << time_duration.count() << " seconds" << std::endl;
 
   G4HCofThisEvent* hce = event->GetHCofThisEvent();

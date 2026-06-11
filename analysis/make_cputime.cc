@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
   for (std::size_t i = 0; i < jobIndices.size(); ++i) {
 
     if (fMapHist.find(cpus[i]) == fMapHist.end())
-      fMapHist[cpus[i]] = new TH1D(cpus[i].c_str(), cpus[i].c_str(), 300, 0, 600); 
+      fMapHist[cpus[i]] = new TH1D(cpus[i].c_str(), cpus[i].c_str(), 400, 0, 40000); 
 
     fMapHist[cpus[i]]->Fill(times[i]);
   }

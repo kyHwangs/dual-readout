@@ -10,6 +10,7 @@
 #include "TF1.h"
 #include "TPaveStats.h"
 #include "TString.h"
+#include "TFile.h"
 
 #include <iostream>
 #include <string>
@@ -17,113 +18,130 @@
 #include <utility>
 #include <map>
 #include <tuple>
+#include <fstream>
+#include <sstream>
 
 
 int main(int argc, char* argv[]) {
-  TString filename = argv[1];
-  int iEta = atoi(argv[2]);
-  int iPhi = 0;
-  float Cthres = 32.5;
+  std::string filename = argv[1];
 
-  float low = 0.;
-  float high = 25.;
+  std::vector<std::string> fProcessor;
+  std::vector<double> fTime;
+
+  std::ifstream fCSV(Form("%s/cpu_time.csv", filename.c_str()));
+  if (fCSV.is_open()) {
+    std::string line;
+
+    while (std::getline(fCSV, line)) {
+      
+      std::stringstream ss(line);
+      std::string idx_str, name, time_str;
+      std::getline(ss, idx_str, ',');
+      std::getline(ss, name, ',');
+      std::getline(ss, time_str, ',');
+      
+      int idx = std::stoi(idx_str);
+      double time = std::stod(time_str);
+      
+      name.erase(0, name.find_first_not_of(" \t\n\r\f\v"));
+      name.erase(name.find_last_not_of(" \t\n\r\f\v") + 1);
+
+      fProcessor.push_back(name);
+      fTime.push_back(time);
+    }
+    fCSV.close();
+  } 
 
   gStyle->SetOptFit(1);
 
-  TH1F* tEdep = new TH1F("Total_Edep","Total Energy deposit;MeV;Evt",100,low*1000.,high*1000.);
-  tEdep->Sumw2(); tEdep->SetLineColor(kBlack); tEdep->SetLineWidth(2);
-  TH1F* tCtime = new TH1F("Total_C_Time","Total timing of Cerenkov ch.;ns;Evt",600,10,70);
-  tCtime->Sumw2(); tCtime->SetLineColor(kBlue); tCtime->SetLineWidth(2);
-  TH1F* tStime = new TH1F("Total_S_Time","Total timing of Scintillation ch.;ns;Evt",600,10,70);
-  tStime->Sumw2(); tStime->SetLineColor(kRed); tStime->SetLineWidth(2);
-  TH1I* tChit = new TH1I("Total_C_Hit","Total hits of Cerenkov ch",100,0.,3000.);
-  tChit->Sumw2(); tChit->SetLineColor(kBlue); tChit->SetLineWidth(2);
-  TH1I* tShit = new TH1I("Total_S_Hit","Total hits of Scintillation ch",100,0.,40000.);
-  tShit->Sumw2(); tShit->SetLineColor(kRed); tShit->SetLineWidth(2);
+  struct HistoSet {
 
-  TH1F* Edep = new TH1F("Edep","Energy deposit;MeV;Evt",100,low*1000.,high*1000.);
-  Edep->Sumw2(); Edep->SetLineColor(kBlack); Edep->SetLineWidth(2);
-  TH1F* Ctime = new TH1F("C_Time","timing of Cerenkov ch.;ns;Evt",600,10,70);
-  Ctime->Sumw2(); Ctime->SetLineColor(kBlue); Ctime->SetLineWidth(2);
-  TH1F* Stime = new TH1F("S_Time","timing of Scintillation ch.;ns;Evt",600,10,70);
-  Stime->Sumw2(); Stime->SetLineColor(kRed); Stime->SetLineWidth(2);
-  TH1I* Chit = new TH1I("C_Hit","hits of Cerenkov ch",100,0.,3000.);
-  Chit->Sumw2(); Chit->SetLineColor(kBlue); Chit->SetLineWidth(2);
-  TH1I* Shit = new TH1I("S_Hit","hits of Scintillation ch",100,0.,40000.);
-  Shit->Sumw2(); Shit->SetLineColor(kRed); Shit->SetLineWidth(2);
+    HistoSet(std::string fName_)
+    : fName(fName_) {
 
-  RootInterface<DRsimInterface::DRsimEventData>* drInterface = new RootInterface<DRsimInterface::DRsimEventData>(std::string(filename)+".root", false);
-  drInterface->GetChain("DRsim");
+      fEdep = new TH1D(Form("%s_Edep", fName.c_str()), "", 200, 0, 200);
+      fEdep->Sumw2();
 
-  unsigned int entries = drInterface->entries();
-  while (drInterface->numEvt() < entries) {
-    if (drInterface->numEvt() % 100 == 0) printf("Analyzing %dth event ...\n", drInterface->numEvt());
+      fSTime = new TH1D(Form("%s_Stime", fName.c_str()), "", 600, 10., 70.);
+      fSTime->Sumw2();
 
-    DRsimInterface::DRsimEventData drEvt;
-    drInterface->read(drEvt);
+      fSHit = new TH1D(Form("%s_Shit", fName.c_str()), "", 400, 0., 400000.);
+      fSHit->Sumw2();
 
-    float fEdep = 0.; float ftEdep = 0.;
-    int fEta = 0; int fPhi = 0;
-
-    for (auto edepItr = drEvt.Edeps.begin(); edepItr != drEvt.Edeps.end(); ++edepItr) {
-      auto edep = *edepItr;
-      fEta = edep.iTheta;
-      fPhi = edep.iPhi;
-      ftEdep += edep.Edep; if(fEta == iEta && fPhi == iPhi) fEdep += edep.Edep;
+      fSWave = new TH1D(Form("%s_SWave", fName.c_str()), "", 120, 300., 900.);
+      fSWave->Sumw2();
     }
 
-    int fC_hits = 0; int fS_hits = 0;
-    int ftC_hits = 0; int ftS_hits = 0;
+    void Write(TFile* fFile) {
+      fFile->cd();
+      this->fEdep->Write();
+      this->fSTime->Write();
+      this->fSHit->Write();
+      this->fSWave->Write();
+    }
 
-    for (auto towerItr = drEvt.towers.begin(); towerItr != drEvt.towers.end(); ++towerItr) {
-      auto sipmItr = *towerItr;
-      std::vector<DRsimInterface::DRsimSiPMData> sipmData = sipmItr.SiPMs;
+    std::string fName;
 
-      fEta = sipmItr.towerTheta.first;
-      fPhi = sipmItr.towerPhi.first;
+    TH1D* fEdep;
 
-      for (int i = 0; i < sipmData.size(); i++) {
+    TH1D* fSTime;
+    TH1D* fSHit;
+    TH1D* fSWave;
+  };
 
-        DRsimInterface::DRsimTimeStruct timeItr = sipmData[i].timeStruct;
+  std::map<std::string, HistoSet> fHistoSet;
+  fHistoSet.emplace("ALL", HistoSet("ALL"));
 
-        for(auto TmpItr = timeItr.begin(); TmpItr != timeItr.end(); ++TmpItr) {
-          auto timeData = *TmpItr;
-          if(DRsimInterface::IsCerenkov(sipmData[i].x, sipmData[i].y)) {
-            tCtime->Fill((timeData.first.first + timeData.first.second)/2, timeData.second);
-            if(fEta == iEta && fPhi == iPhi) Ctime->Fill((timeData.first.first + timeData.first.second)/2, timeData.second);
-            if (timeData.first.first < Cthres) {
-              ftC_hits += timeData.second; if(fEta == iEta && fPhi == iPhi) fC_hits += timeData.second;
-            }
-          } else {
-            tStime->Fill((timeData.first.first + timeData.first.second)/2, timeData.second);
-            ftS_hits += timeData.second;
-            if(fEta == iEta && fPhi == iPhi){
-              Stime->Fill((timeData.first.first + timeData.first.second)/2, timeData.second);
-              fS_hits += timeData.second;
-            }
+  for (std::size_t i = 0; i < fProcessor.size(); i++) {
+
+    std::cout << i << " " << Form("%s/root/output_%d.root", filename.c_str(), i) << std::endl;
+
+    if (fHistoSet.find(fProcessor[i]) == fHistoSet.end())
+      fHistoSet.emplace(fProcessor[i], HistoSet(fProcessor[i]));
+
+    RootInterface<DRsimInterface::DRsimEventData>* drInterface 
+      = new RootInterface<DRsimInterface::DRsimEventData>(Form("%s/root/output_%d.root", filename.c_str(), i), false);
+    drInterface->GetChain("DRsim");
+
+    unsigned int entries = drInterface->entries();
+    while (drInterface->numEvt() < entries) {
+
+      DRsimInterface::DRsimEventData drEvt;
+      drInterface->read(drEvt);
+
+      float fEdep = 0.;
+      for (const auto fItrEdep : drEvt.Edeps)
+        fEdep += fItrEdep.Edep;
+
+      fHistoSet.at("ALL").fEdep->Fill(fEdep / 1000.);
+      fHistoSet.at(fProcessor[i]).fEdep->Fill(fEdep / 1000.);
+
+      int fSHits = 0;
+      for (const auto fItrTower : drEvt.towers) {        
+        for (const auto fItrSiPM : fItrTower.SiPMs) {
+
+          for(const auto fItrTime : fItrSiPM.timeStruct) {
+            fHistoSet.at("ALL").fSTime->Fill((fItrTime.first.first + fItrTime.first.second) / 2., fItrTime.second);
+            fHistoSet.at(fProcessor[i]).fSTime->Fill((fItrTime.first.first + fItrTime.first.second) / 2., fItrTime.second);
+            fSHits += fItrTime.second;
+          }
+
+          for(const auto fItrWave : fItrSiPM.wavlenSpectrum) {
+            fHistoSet.at("ALL").fSWave->Fill(fItrWave.first.first, fItrWave.second);
+            fHistoSet.at(fProcessor[i]).fSWave->Fill(fItrWave.first.first, fItrWave.second);
           }
         }
       }
-    }
 
-    tEdep->Fill(ftEdep);
-    Edep->Fill(fEdep);
-    Chit->Fill(fC_hits);
-    Shit->Fill(fS_hits);
-    tChit->Fill(ftC_hits);
-    tShit->Fill(ftS_hits);
+      fHistoSet.at("ALL").fSHit->Fill(fSHits);
+      fHistoSet.at(fProcessor[i]).fSHit->Fill(fSHits);
+    }
   }
 
-  TCanvas* c = new TCanvas("c","");
+  TFile* fFile = new TFile(Form("%s/summary.root", filename.c_str()), "RECREATE");
 
-  tEdep->Draw("Hist"); c->SaveAs(filename+"_TotalEdep.png");
-  Edep->Draw("Hist"); c->SaveAs(filename+"_Edep.png");
-  Chit->Draw(); c->SaveAs(filename+"_Chit.png");
-  Shit->Draw(); c->SaveAs(filename+"_Shit.png");
-  tChit->Draw(); c->SaveAs(filename+"_TotalChit.png");
-  tShit->Draw(); c->SaveAs(filename+"_TotalShit.png");
-  Ctime->Draw("Hist"); c->SaveAs(filename+"_Ctime.png");
-  Stime->Draw("Hist"); c->SaveAs(filename+"_Stime.png");
-  tCtime->Draw("Hist"); c->SaveAs(filename+"_TotalCtime.png");
-  tStime->Draw("Hist"); c->SaveAs(filename+"_TotalStime.png");
+  for (auto& [key, value] : fHistoSet)
+    value.Write(fFile);
+
+  fFile->Close();
 }

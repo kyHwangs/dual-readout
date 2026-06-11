@@ -23,11 +23,11 @@ from ._utils import env_type
 # This global variables for the module should not
 # be accessed directy! Use the utilities below.
 
-cms_lumi = "Run 2, 138 fb^{#minus1}"
-cms_energy = "13 TeV"
+cms_lumi = ""
+cms_energy = ""
 
-cmsText = "CMS"
-extraText = "Preliminary"
+cmsText = ""
+extraText = ""
 
 cmsStyle = None
 

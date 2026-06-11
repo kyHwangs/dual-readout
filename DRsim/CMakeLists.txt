@@ -46,6 +46,9 @@ target_link_libraries(
 file(GLOB DRsim_MACROS ${PROJECT_SOURCE_DIR}/*.mac)
 file(COPY ${DRsim_MACROS} DESTINATION ${PROJECT_BINARY_DIR})
 
+file(GLOB PY_MACROS ${PROJECT_SOURCE_DIR}/*.py)
+file(COPY ${PY_MACROS} DESTINATION ${PROJECT_BINARY_DIR})
+
 #----------------------------------------------------------------------------
 # Add program to the project targets
 # (this avoids the need of typing the program name after make)
@@ -57,3 +60,4 @@ file(COPY ${DRsim_MACROS} DESTINATION ${PROJECT_BINARY_DIR})
 #
 install(TARGETS DRsim DESTINATION bin)
 install(FILES ${DRsim_MACROS} DESTINATION .)
+install(FILES ${PY_MACROS} DESTINATION .)

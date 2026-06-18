@@ -3,7 +3,7 @@
 /control/verbose 2
 #
 # Use this open statement to create an OpenGL view:
-/vis/open OGL 600x600-0+0
+/vis/open TSGQtZB 600x600-0+0
 #
 # Use this open statement to create a .prim file suitable for
 # viewing in DAWN:
@@ -24,6 +24,11 @@
 #
 # Draw geometry:
 /vis/drawVolume
+
+/vis/viewer/set/background black
+/vis/viewer/set/style wireframe
+/vis/viewer/reset
+/vis/viewer/flush
 #
 # Specify view angle:
 /vis/viewer/set/upVector 1 0 0

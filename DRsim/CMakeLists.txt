@@ -36,6 +36,11 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 # Add the executable, and link it to the Geant4 libraries
 #
 add_executable(DRsim DRsim.cc ${sources} ${headers})
+
+if(WITH_GEANT4_UIVIS)
+  target_compile_definitions(DRsim PRIVATE G4UI_USE G4VIS_USE)
+endif()
+
 target_link_libraries(
   DRsim ${Geant4_LIBRARIES}
   ${HEPMC_DIR}/lib64/libHepMC3.so

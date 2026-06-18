@@ -99,7 +99,8 @@ void SetMaximum(std::map<std::string, TH1D*>& fMapHist) {
 
 
 int main(int argc, char* argv[]) {
-  std::string csvPath = (argc >= 2) ? argv[1] : "cpu_time.csv";
+  double maxTime = (argc >= 2) ? std::stof(argv[1]) : 40000;
+  std::string csvPath = (argc >= 3) ? argv[2] : "cpu_time.csv";
 
   std::vector<int> jobIndices;
   std::vector<std::string> cpus;
@@ -116,7 +117,7 @@ int main(int argc, char* argv[]) {
   for (std::size_t i = 0; i < jobIndices.size(); ++i) {
 
     if (fMapHist.find(cpus[i]) == fMapHist.end())
-      fMapHist[cpus[i]] = new TH1D(cpus[i].c_str(), cpus[i].c_str(), 400, 0, 40000); 
+      fMapHist[cpus[i]] = new TH1D(cpus[i].c_str(), cpus[i].c_str(), 400, 0, maxTime); 
 
     fMapHist[cpus[i]]->Fill(times[i]);
   }
@@ -136,13 +137,15 @@ int main(int argc, char* argv[]) {
   int i = 0;
   for (auto itr = fMapHist.begin(); itr != fMapHist.end(); ++itr) {
 
-    hCount->SetBinContent(i + 1, itr->second->GetEntries());
+    int entries = itr->second->GetEntries();
+
+    hCount->SetBinContent(i + 1, entries);
     hCount->GetXaxis()->SetBinLabel(i + 1, itr->first.c_str());
 
     itr->second->SetLineColor(TColor::GetColor(fColors[i].c_str()));
     itr->second->SetLineWidth(2);
 
-    l->AddEntry(itr->second, Form("#color[%d]{#splitline{%s}{#mu = %.3f, RMS = %.3f}}", TColor::GetColor(fColors[i].c_str()), itr->first.c_str(), itr->second->GetMean(), itr->second->GetRMS()), "l");
+    l->AddEntry(itr->second, Form("#color[%d]{#splitline{%s}{#mu = %.3f, RMS = %.3f, Entries = %d}}", TColor::GetColor(fColors[i].c_str()), itr->first.c_str(), itr->second->GetMean(), itr->second->GetRMS(), entries), "l");
 
     itr->second->SetStats(0);
 

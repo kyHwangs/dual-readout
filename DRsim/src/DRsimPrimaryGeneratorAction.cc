@@ -132,13 +132,18 @@ void DRsimPrimaryGeneratorAction::GeneratePrimaries(G4Event* event) {
     return;
   }
 
-  G4double x = (G4UniformRand()-0.5) * fRandX + fX_0;//- 3.142*cm;//
-  G4double y = (G4UniformRand()-0.5) * fRandY + fY_0;//- 4.7135*cm;//10x10 mm^2
+  G4double xOffset = -3000. * tan(M_PI * 1.5 / 180.) * mm;
+  G4double yOffset = xOffset * tan(M_PI * 1. / 180.) * mm;
+
+  G4double x = (G4UniformRand()-0.5) * fRandX + fX_0 + xOffset;
+  G4double y = (G4UniformRand()-0.5) * fRandY + fY_0;
   fOrg.set(x, y, -1500. * mm);
 
   fParticleGun->SetParticlePosition(fOrg); // http://www.apc.univ-paris7.fr/~franco/g4doxy/html/classG4VPrimaryGenerator.html
 
   fDirection.setRThetaPhi(1.,0.,0.);
+  fDirection.rotateY(M_PI * 1.5 / 180.);
+  fDirection.rotateZ(M_PI * 1. / 180.);
   
   fParticleGun->SetParticleMomentumDirection(fDirection);
 

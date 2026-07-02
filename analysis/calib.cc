@@ -24,6 +24,7 @@
 
 int main(int argc, char* argv[]) {
   std::string filename = argv[1];
+  double fEnergy = std::stod(argv[2]);
 
   std::vector<std::string> fProcessor;
   std::vector<double> fTime;
@@ -56,7 +57,7 @@ int main(int argc, char* argv[]) {
 
   struct HistoSet {
 
-    HistoSet(std::string fName_)
+    HistoSet(std::string fName_, double fEnergy_)
     : fName(fName_) {
 
       fEdep = new TH1D(Form("%s_Edep", fName.c_str()), "", 200, 0, 200);
@@ -65,7 +66,8 @@ int main(int argc, char* argv[]) {
       fSTime = new TH1D(Form("%s_Stime", fName.c_str()), "", 600, 10., 70.);
       fSTime->Sumw2();
 
-      fSHit = new TH1D(Form("%s_Shit", fName.c_str()), "", 400, 0., 400000.);
+      double fMaxHit = 400000. * fEnergy_;
+      fSHit = new TH1D(Form("%s_Shit", fName.c_str()), "", 400, 0., fMaxHit);
       fSHit->Sumw2();
 
       fSWave = new TH1D(Form("%s_SWave", fName.c_str()), "", 120, 300., 900.);
@@ -90,14 +92,14 @@ int main(int argc, char* argv[]) {
   };
 
   std::map<std::string, HistoSet> fHistoSet;
-  fHistoSet.emplace("ALL", HistoSet("ALL"));
+  fHistoSet.emplace("ALL", HistoSet("ALL", fEnergy));
 
   for (std::size_t i = 0; i < fProcessor.size(); i++) {
 
     std::cout << i << " " << Form("%s/root/output_%d.root", filename.c_str(), i) << std::endl;
 
     if (fHistoSet.find(fProcessor[i]) == fHistoSet.end())
-      fHistoSet.emplace(fProcessor[i], HistoSet(fProcessor[i]));
+      fHistoSet.emplace(fProcessor[i], HistoSet(fProcessor[i], fEnergy));
 
     RootInterface<DRsimInterface::DRsimEventData>* drInterface 
       = new RootInterface<DRsimInterface::DRsimEventData>(Form("%s/root/output_%d.root", filename.c_str(), i), false);
